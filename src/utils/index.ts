@@ -27,9 +27,12 @@ export const applyMiddleware = (
 };
 
 export const applyRoutes = (routes: any, router: Router): void => {
-  console.log("____________________routes____________________", routes);
-  console.log("____________________routes____________________", routes);
   const routesArray = Array.isArray(routes) ? routes : [routes];
+  // console.log(
+  //   "_+++++++++++++++++++++ Array.isArray(routes)_+++++++++++++++++++++",
+  //   Array.isArray(routes)
+  // );
+  // console.log("routes", routesArray);
 
   for (const route of routesArray) {
     const { method, path, handler } = route;
@@ -37,7 +40,11 @@ export const applyRoutes = (routes: any, router: Router): void => {
     (router as any)[method](
       path,
       handleArray.map(
-        (handler): Handler => async (req, res, next): Promise<void> => {
+        (handler: any, i: any, arr: any): any => async (
+          req: any,
+          res: any,
+          next: any
+        ): Promise<void> => {
           try {
             await handler(req, res, next);
           } catch (error) {

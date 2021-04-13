@@ -19,7 +19,8 @@ export default [
       // validateBody(['userId']),
       () => console.log("234"),
       (req: Request, res: Response, next: NextFunction): void => {
-        res.send("ckram skram!!!");
+        // res.send("ckram skram!!!");
+        console.log("567");
       },
     ],
   },

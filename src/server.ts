@@ -8,8 +8,8 @@ const port = process.env.PORT || 4000;
 
 let interval: any;
 
-console.log("routes", routes);
+// console.log("routes", routes);
 
-// applyMiddleware(entry, app);
+applyMiddleware(entry, app);
 applyRoutes(routes, app);
 app.listen(port, () => console.log(`Listening on port ${port}`));

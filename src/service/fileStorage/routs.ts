@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import addHike from "./utilities/addHike";
+import savePost from "./utilities/savePost";
 
 // import {validateBody} from '../../middleware/validate';
 
@@ -17,12 +17,9 @@ export default [
     path: "/api/post",
     method: "post",
     handler: [
-      async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-      ): Promise<void> => {
-        await addHike(req, res, next);
+      (req: Request, res: Response, next: NextFunction): any => {
+        savePost(req, res, next);
+        res.send("OKK!!!");
       },
     ],
   },
