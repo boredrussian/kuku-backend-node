@@ -8,7 +8,6 @@ const getPostJsonFromObj = (post: any) => {
     delete postCopy.hash;
     delete postCopy.signatures;
   }
-  console.log("postCopy[getPostJson]", postCopy);
   postCopy = sortKeys(postCopy);
   return stringify(postCopy);
 };
