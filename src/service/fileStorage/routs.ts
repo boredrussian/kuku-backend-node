@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import savePost from "./utilities/savePost";
+import getIndexPosts from "./utilities/getPosts";
 
 // import {validateBody} from '../../middleware/validate';
 
@@ -9,8 +10,7 @@ export default [
     method: "get",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
-        res.send("ckram skram post!!!");
-        
+        getIndexPosts(req, res, next);
       },
     ],
   },
@@ -18,9 +18,9 @@ export default [
     path: "/api/post",
     method: "post",
     handler: [
-      (req: Request, res: Response, next: NextFunction): any => {
+      (req: Request, res: Response, next: NextFunction): void => {
         savePost(req, res, next);
-        res.send("OKK!!!");
+        res.send("OK");
       },
     ],
   },

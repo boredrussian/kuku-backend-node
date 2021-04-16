@@ -2,14 +2,15 @@ import createError from "http-errors";
 import { Request, Response, NextFunction } from "express";
 import HttpStatus from "http-status-codes";
 import { isPostValid } from "../../../lib/signature";
-import { jsonFsHandler } from "../../../lib/fs";
+import { updateIndex, putFile } from "../../../lib/fs";
 
 // import Logger from "../../../lib/logger";
 // const logger = new Logger();
 
 const savePost = async (req: Request, res: Response, next: NextFunction) => {
   // logger.info(`>>>>>> Come in savePost controller`);
-  const { post } = req.body;
+  const { post, addToIndex } = req.body;
+  console.log("addToIndex", addToIndex);
   let isValid;
   try {
     isValid = isPostValid(post);
@@ -19,7 +20,10 @@ const savePost = async (req: Request, res: Response, next: NextFunction) => {
     return next();
   }
   if (isValid) {
-    jsonFsHandler(post);
+    putFile(post);
+    if (addToIndex) {
+      updateIndex(post);
+    }
   }
 
   // logger.info(`<<<<<< Come out savePost controller`);
