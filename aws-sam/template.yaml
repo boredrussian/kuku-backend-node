@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: signed.移动 node at AWS
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+Resources:
+  IndexTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: signed-index
+      AttributeDefinitions:
+        - AttributeName: address
+          AttributeType: S
+        - AttributeName: version
+          AttributeType: N
+      KeySchema:
+        - AttributeName: address
+          KeyType: HASH
+        - AttributeName: version
+          KeyType: RANGE
+      BillingMode: "PAY_PER_REQUEST"
+  PublicAPIRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+         - Effect: Allow
+           Principal:
+             Service:
+             - apigateway.amazonaws.com
+           Action:
+            - sts:AssumeRole
+      Policies:
+       - PolicyName: PublicAPIPolicy
+         PolicyDocument:
+           Version: 2012-10-17
+           Statement:
+            - Effect: Allow
+              Action:
+                - "dynamodb:Query"
+              Resource: !GetAtt IndexTable.Arn
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'POST, GET'"
+        AllowHeaders: "'X-Forwarded-For'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: 3.0.2
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: index-openapi.yaml
+  LambdaLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: signed-lambda-layer
+            Description: Dependencies for signed.移动
+            ContentUri: lambda-layer/
+            CompatibleRuntimes:
+              - nodejs14
+            LicenseInfo: 'MIT'
+            RetentionPolicy: Retain
+Outputs:
+  IndexUrl:
+    Description: Public Index URL
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
