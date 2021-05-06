@@ -4,7 +4,8 @@ import parseJson from "parse-json";
 import path from "path";
 import fsp from "fs/promises";
 
-const fsPath = process.cwd() + "/src/fileStorage";
+const fsPath = process.cwd() + "/src/fileStorage/books";
+const fsPathIndex = process.cwd() + "/src/fileStorage";
 // path.join(__dirname, "test______")
 
 const getFoldersName = (hash: string) => {
@@ -39,14 +40,14 @@ export const putFile = async (post: any) => {
 export const updateIndex = async (post: any) => {
   let book;
   try {
-    book = parseJson(await fsp.readFile(`${fsPath}/book.json`, "utf8"));
+    book = parseJson(await fsp.readFile(`${fsPathIndex}/book.json`, "utf8"));
     book.posts.push(post);
   } catch (e) {
     console.error("[jsonFsHandler][Error parsing JSON string:]", e);
   }
 
   try {
-    await fsp.writeFile(`${fsPath}/book.json`, stringify(book));
+    await fsp.writeFile(`${fsPathIndex}/book.json`, stringify(book));
   } catch (e) {
     console.error("[jsonFsHandler][Error parsing JSON string:]", e);
   }
@@ -55,7 +56,7 @@ export const updateIndex = async (post: any) => {
 export const readIndex = async () => {
   let data;
   try {
-    data = parseJson(await fsp.readFile(`${fsPath}/book.json`, "utf8"));
+    data = parseJson(await fsp.readFile(`${fsPathIndex}/book.json`, "utf8"));
   } catch (e) {
     console.error("[readIndex]", e);
   }
