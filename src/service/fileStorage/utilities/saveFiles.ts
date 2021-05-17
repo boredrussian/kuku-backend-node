@@ -14,6 +14,7 @@ import { createHash } from "crypto";
 // import Logger from "../../../lib/logger";
 // const logger = new Logger();
 import { nanoid } from "nanoid";
+import mime from "mime";
 
 export const getHash = (data: any) => {
   const postJson = "string";
@@ -64,11 +65,9 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
       encoding: any,
       mimetype: any
     ) {
-      const fileNameArr = filename.split(".");
-      let nameExtension = fileNameArr[fileNameArr.length - 1];
-      mime.getType("txt"); // ⇨ 'text/plain'
-      mime.getExtension("text/plain");
-      const tempFileName = `${tempFileNameHash}.${nameExtension}`;
+      // mime.getType("txt"); // ⇨ 'text/plain'
+      const fileExtension = mime.getExtension(mimetype);
+      const tempFileName = `${tempFileNameHash}.${fileExtension}`;
       const saveTo = path.join(fsPath, tempFileName);
       file.on("data", function (data: any) {
         sha256.update(data.toString("base64"));
@@ -79,7 +78,7 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
         const hashString = hashFin.toString(CryptoJS.enc.Hex);
         const bytes = Buffer.from(hashString, "hex");
         hash_58 = bs58.encode(bytes);
-        const hashFileName = `${hash_58}.${nameExtension}`;
+        const hashFileName = `${hash_58}.${fileExtension}`;
 
         try {
           await fsp.rename(
@@ -89,7 +88,6 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
         } catch (e) {
           console.warn("rename files", e);
         }
-        // res.end("resHash");
       });
 
       const stream = fs.createWriteStream(saveTo);
@@ -98,17 +96,17 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
       stream.on("close", () => {
         const resData = {
           hash: hash_58,
-          type: nameExtension,
+          type: mimetype,
         };
         res.send(resData);
       });
     }
   );
 
-  busboy.on("finish", function () {
-    // res.send(hash_58);
-    // res.writeHead(200, { Connection: "close" });
-  });
+  // busboy.on("finish", function () {
+  //   // res.send(hash_58);
+  //   // res.writeHead(200, { Connection: "close" });
+  // });
 
   return req.pipe(busboy);
 };

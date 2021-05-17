@@ -26,12 +26,11 @@ export default [
     ],
   },
   {
-    path: "/api/files/upload",
+    path: "/api/file/upload",
     method: "post",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
         saveFiles(req, res, next);
-        // res.send("OK");
       },
     ],
   },
