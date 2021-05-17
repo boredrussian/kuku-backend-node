@@ -63,7 +63,7 @@ Resources:
             Description: Dependencies for signed.移动
             ContentUri: lambda-layer/
             CompatibleRuntimes:
-              - nodejs14
+              - nodejs14.x
             LicenseInfo: 'MIT'
             RetentionPolicy: Retain
 Outputs:
