@@ -15,6 +15,10 @@ import { createHash } from "crypto";
 // const logger = new Logger();
 import { nanoid } from "nanoid";
 import mime from "mime";
+import { putObjectS3 } from "../../../lib/fsAWS";
+// import AWS from "aws-sdk";
+
+// const s3 = new AWS.S3();
 
 export const getHash = (data: any) => {
   const postJson = "string";
@@ -54,7 +58,7 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
 
   const sha256 = CryptoJS.algo.SHA256.create();
 
-  let hash_58: string = "alr";
+  let hash_58: string;
 
   busboy.on(
     "file",
@@ -87,6 +91,18 @@ const saveFiles = async (req: Request, res: Response, next: NextFunction) => {
           );
         } catch (e) {
           console.warn("rename files", e);
+        }
+
+        try {
+          const data = await fsp.readFile(path.join(fsPath, hashFileName));
+          const saveToPath = `${process.env.AWS_PATH_PUT_IMG}/${hashFileName}`;
+          putObjectS3({
+            key: saveToPath,
+            data,
+            type: mimetype,
+          });
+        } catch (e) {
+          console.error("[readIndex]", e);
         }
       });
 
