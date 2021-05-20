@@ -5,7 +5,13 @@ import path from "path";
 import fsp from "fs/promises";
 import { putObjectS3 } from "./fsAWS";
 import AWS from "aws-sdk";
-import { createTable, deleteTable, updateIndexDb, getIndex } from "./dbAWS";
+import {
+  createTable,
+  deleteTable,
+  updateIndexDb,
+  getIndex,
+  putData,
+} from "./dbAWS";
 
 // const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -70,14 +76,22 @@ export const updateIndex = async (post: any) => {
     book.posts.push(post);
 
     // createTable({});
-    // await updateIndexDb({
-    //   data: { posts: [] },
-    //   address: "testHash",
-    //   version: 0,
-    // });
 
-    const data = await getIndex({ address: "testHash" });
-    console.log("getIndex", data);
+    /*    await putData({
+      data: { "posts": [] },
+      address: "testHash",
+      version: 0,
+    }); */
+
+    // deleteTable({});
+
+    // const data = await getIndex({ address: "testHash" });
+    const data = await updateIndexDb({ data: post, address: "testHash" });
+
+    // console.log(
+    //   "_____________________-----------------------______________getIndex",
+    //   data
+    // );
 
     // await dynamoDb.put(params).promise();
   } catch (e) {

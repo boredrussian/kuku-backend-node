@@ -1,9 +1,21 @@
 import AWS from "aws-sdk";
 import stringify from "fast-json-stable-stringify";
 import parseJson from "parse-json";
+// import awsConfig from "../../awsSecureConfig/config";
+
+/**
+ * Table Index schema {
+ * address : {type :string,description : 'bitcoin address that get from sources' }
+ * index : {type :string,description : 'json, object that include posts, and sources in future' }
+ * version : {type : number: 'dynamoDb in any case wait string, sage version for  optimistic locking' }
+ *  }
+ *
+ *  */
 
 AWS.config.update({
   region: "us-west-2",
+  // accessKeyId: awsConfig.accessKeyId,
+  // secretAccessKey: awsConfig.secretAccessKey,
 });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -41,7 +53,7 @@ interface Type_GetData {
   address: string;
 }
 
-const putData = async ({
+export const putData = async ({
   tableName = "signed-index",
   data,
   address,
@@ -51,7 +63,7 @@ const putData = async ({
     TableName: tableName,
     Item: {
       address: address,
-      index: stringify(data),
+      indexStore: stringify(data),
       version: version,
     },
   };
@@ -62,7 +74,7 @@ export const getIndex = async ({
   tableName = "signed-index",
   address,
 }: Type_GetData) => {
-  let res: any = "fdf";
+  let res: any;
 
   const params = {
     TableName: tableName,
@@ -70,34 +82,62 @@ export const getIndex = async ({
       address: address,
     },
   };
-
-  //   dynamoDb.get(params, function (err, data) {
-  //     if (err) {
-  //       console.error(
-  //         "Unable to read item. Error JSON:",
-  //         JSON.stringify(err, null, 2)
-  //       );
-  //     } else {
-  //       console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-  //       res = data;
-  //     }
-  //   });
-
   const data = await dynamoDb.get(params).promise();
-  console.log("data", data);
   return data;
 };
 
 export const updateIndexDb = async ({
   tableName = "signed-index",
   data,
-  address,
+  address = "testHash",
   version,
 }: Type_UpdateData) => {
-  const lastData = getIndex({ address: "testHash" });
+  let postsObject, newIndexJson;
+  const currentData = await getIndex({ address: "testHash" });
+  const currentVersion = currentData?.Item?.version;
+  const indexJson = currentData?.Item?.indexStore;
+
+  try {
+    const indexObject = parseJson(indexJson);
+    const postArray = indexObject.posts;
+    if (Array.isArray(postArray)) {
+      postArray.push(data);
+    }
+    indexObject.posts = postArray;
+    newIndexJson = stringify(indexObject);
+  } catch (e) {
+    console.warn("[updateIndexDb]", e);
+  }
+
+  const params = {
+    // Get the table name from the environment variable
+    TableName: tableName,
+    // Get the row where the noteId is the one in the path
+    Key: {
+      address: address,
+    },
+    // Update the "content" column with the one passed in
+    UpdateExpression: "SET #indexStore = :newIndexStore, #version = :version",
+    ConditionExpression: "#version = :expectedVersion",
+    ExpressionAttributeNames: {
+      "#indexStore": "indexStore",
+      "#version": "version",
+    },
+    ExpressionAttributeValues: {
+      // ":indexStore": '{ "posts": [] }',
+      ":newIndexStore": newIndexJson,
+      ":version": currentVersion + 1,
+      ":expectedVersion": currentVersion,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const results = await dynamoDb.update(params).promise();
+  console.log("results", results);
 };
 
 export const deleteTable = ({ tableName = "signed-index" }) => {
+  // const results = await dynamoDb.update(params).promise();
   dynamoDbTable.deleteTable({ TableName: tableName }, function (err, data) {
     if (err) {
       console.error(
