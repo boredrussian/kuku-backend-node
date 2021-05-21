@@ -1,7 +1,6 @@
 import AWS from "aws-sdk";
 import stringify from "fast-json-stable-stringify";
 import parseJson from "parse-json";
-// import awsConfig from "../../awsSecureConfig/config";
 
 /**
  * Table Index schema {
@@ -14,8 +13,6 @@ import parseJson from "parse-json";
 
 AWS.config.update({
   region: "us-west-2",
-  // accessKeyId: awsConfig.accessKeyId,
-  // secretAccessKey: awsConfig.secretAccessKey,
 });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -63,7 +60,7 @@ export const putData = async ({
     TableName: tableName,
     Item: {
       address: address,
-      indexStore: stringify(data),
+      index: stringify(data),
       version: version,
     },
   };
@@ -95,10 +92,20 @@ export const updateIndexDb = async ({
   let postsObject, newIndexJson;
   const currentData = await getIndex({ address: "testHash" });
   const currentVersion = currentData?.Item?.version;
-  const indexJson = currentData?.Item?.indexStore;
+  const indexJson = currentData?.Item?.index;
+
+  console.log(
+    "currentData_______________________________________",
+    currentData
+  );
+  console.log(
+    "currentVersion_______________________________________",
+    currentVersion
+  );
 
   try {
     const indexObject = parseJson(indexJson);
+    console.log("indexObject", indexObject);
     const postArray = indexObject.posts;
     if (Array.isArray(postArray)) {
       postArray.push(data);
@@ -110,22 +117,19 @@ export const updateIndexDb = async ({
   }
 
   const params = {
-    // Get the table name from the environment variable
     TableName: tableName,
-    // Get the row where the noteId is the one in the path
     Key: {
       address: address,
     },
-    // Update the "content" column with the one passed in
-    UpdateExpression: "SET #indexStore = :newIndexStore, #version = :version",
+    UpdateExpression: "SET #index = :newIndex, #version = :version",
     ConditionExpression: "#version = :expectedVersion",
     ExpressionAttributeNames: {
-      "#indexStore": "indexStore",
+      "#index": "index",
       "#version": "version",
     },
     ExpressionAttributeValues: {
-      // ":indexStore": '{ "posts": [] }',
-      ":newIndexStore": newIndexJson,
+      // ":index": '{ "posts": [] }',
+      ":newIndex": newIndexJson,
       ":version": currentVersion + 1,
       ":expectedVersion": currentVersion,
     },

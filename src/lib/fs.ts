@@ -76,14 +76,13 @@ export const updateIndex = async (post: any) => {
     book.posts.push(post);
 
     // createTable({});
+    // deleteTable({});
 
-    /*    await putData({
-      data: { "posts": [] },
+    /*     await putData({
+      data: { posts: [] },
       address: "testHash",
       version: 0,
     }); */
-
-    // deleteTable({});
 
     // const data = await getIndex({ address: "testHash" });
     const data = await updateIndexDb({ data: post, address: "testHash" });
