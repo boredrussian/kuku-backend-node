@@ -11,7 +11,7 @@ import {
   updateIndexDb,
   getIndex,
   putData,
-} from "./dbAWS";
+} from "../dataBase/post/postDb";
 
 // const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
