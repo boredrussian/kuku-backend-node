@@ -13,15 +13,6 @@ import {
   putData,
 } from "../dataBase/post/postDb";
 
-// const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
-// AWS.config.update({
-//   region: "us-west-2",
-// });
-
-// const dynamoDb = new AWS.DynamoDB.DocumentClient();
-// const dynamoDbCreate = new AWS.DynamoDB();
-
 const fsPath = process.cwd() + "/src/fileStorage/books";
 const fsPathIndex = process.cwd() + "/src/fileStorage";
 
@@ -86,11 +77,6 @@ export const updateIndex = async (post: any) => {
 
     // const data = await getIndex({ address: "testHash" });
     const data = await updateIndexDb({ data: post, address: "testHash" });
-
-    // console.log(
-    //   "_____________________-----------------------______________getIndex",
-    //   data
-    // );
 
     // await dynamoDb.put(params).promise();
   } catch (e) {

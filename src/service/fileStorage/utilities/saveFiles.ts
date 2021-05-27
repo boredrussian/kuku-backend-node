@@ -16,7 +16,6 @@ import { createHash } from "crypto";
 import { nanoid } from "nanoid";
 import mime from "mime";
 import { putObjectS3 } from "../../../lib/fsAWS";
- 
 
 export const getHash = (data: any) => {
   const postJson = "string";

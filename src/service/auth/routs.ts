@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import register from "./utilities/register";
+import { register, isUniqLogin } from "./utilities/register";
+import { getUser, getTokensPair } from "./utilities/getUser";
 
 export default [
   {
@@ -8,6 +9,16 @@ export default [
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
         register(req, res, next);
+        // res.send("OK");
+      },
+    ],
+  },
+  {
+    path: "/api/isFreeLogin",
+    method: "post",
+    handler: [
+      (req: Request, res: Response, next: NextFunction): void => {
+        isUniqLogin(req, res, next);
       },
     ],
   },
@@ -17,6 +28,27 @@ export default [
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
         res.send("OK");
+        register(req, res, next);
+      },
+    ],
+  },
+  {
+    path: "/api/user-by-token",
+    method: "post",
+    handler: [
+      (req: Request, res: Response, next: NextFunction): void => {
+        console.log("+++++++++++++++++ki++++++++++++++++++++++++++++++");
+
+        getUser(req, res, next);
+      },
+    ],
+  },
+  {
+    path: "/api/tokens-pair",
+    method: "post",
+    handler: [
+      (req: Request, res: Response, next: NextFunction): void => {
+        getTokensPair(req, res, next);
       },
     ],
   },

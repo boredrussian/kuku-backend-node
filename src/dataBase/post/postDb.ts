@@ -94,18 +94,8 @@ export const updateIndexDb = async ({
   const currentVersion = currentData?.Item?.version;
   const indexJson = currentData?.Item?.index;
 
-  console.log(
-    "currentData_______________________________________",
-    currentData
-  );
-  console.log(
-    "currentVersion_______________________________________",
-    currentVersion
-  );
-
   try {
     const indexObject = parseJson(indexJson);
-    console.log("indexObject", indexObject);
     const postArray = indexObject.posts;
     if (Array.isArray(postArray)) {
       postArray.push(data);
@@ -137,11 +127,9 @@ export const updateIndexDb = async ({
   };
 
   const results = await dynamoDb.update(params).promise();
-  console.log("results", results);
 };
 
 export const deleteTable = ({ tableName = "signed-index" }) => {
-  // const results = await dynamoDb.update(params).promise();
   dynamoDbTable.deleteTable({ TableName: tableName }, function (err, data) {
     if (err) {
       console.error(

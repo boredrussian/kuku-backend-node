@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import { Request, Response, NextFunction } from "express";
 import stringify from "fast-json-stable-stringify";
 import parseJson from "parse-json";
 
@@ -18,3 +19,212 @@ AWS.config.update({
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const dynamoDbTable = new AWS.DynamoDB();
+
+interface Type_CreateTable {
+  tableName?: string;
+}
+
+export const createTable = ({ tableName = "users" }: Type_CreateTable) => {
+  const paramsCreate = {
+    TableName: tableName,
+    AttributeDefinitions: [
+      { AttributeName: "address", AttributeType: "S" },
+      { AttributeName: "login", AttributeType: "S" },
+      { AttributeName: "accessToken", AttributeType: "S" },
+      { AttributeName: "refreshToken", AttributeType: "S" },
+    ],
+    KeySchema: [{ AttributeName: "address", KeyType: "HASH" }],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 10,
+      WriteCapacityUnits: 10,
+    },
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: "login_index",
+        KeySchema: [
+          {
+            AttributeName: "login",
+            KeyType: "HASH",
+          },
+        ],
+        Projection: {
+          ProjectionType: "ALL",
+        },
+        ProvisionedThroughput: {
+          WriteCapacityUnits: 5,
+          ReadCapacityUnits: 10,
+        },
+      },
+      {
+        IndexName: "accessToken_index",
+        KeySchema: [
+          {
+            AttributeName: "accessToken",
+            KeyType: "HASH",
+          },
+        ],
+        Projection: {
+          ProjectionType: "ALL",
+        },
+        ProvisionedThroughput: {
+          WriteCapacityUnits: 5,
+          ReadCapacityUnits: 10,
+        },
+      },
+      {
+        IndexName: "refreshToken_index",
+        KeySchema: [
+          {
+            AttributeName: "refreshToken",
+            KeyType: "HASH",
+          },
+        ],
+        Projection: {
+          ProjectionType: "ALL",
+        },
+        ProvisionedThroughput: {
+          WriteCapacityUnits: 5,
+          ReadCapacityUnits: 10,
+        },
+      },
+    ],
+  };
+
+  dynamoDbTable.createTable(paramsCreate, function (err: any, data: any) {
+    if (err) {
+      console.error("Unable to create table", err);
+    } else {
+      console.log("Created table", data);
+    }
+  });
+};
+
+interface Type_PutData {
+  tableName?: string;
+  address: string;
+  encryptedWif: string;
+  salt: string;
+  privateKey: string;
+  verifier: string;
+  login: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const putData = async ({
+  tableName = "users",
+  address,
+  encryptedWif,
+  salt,
+  privateKey,
+  verifier,
+  login,
+  accessToken,
+  refreshToken,
+}: Type_PutData) => {
+  const params = {
+    TableName: tableName,
+    Item: {
+      address,
+      encryptedWif,
+      salt,
+      privateKey,
+      verifier,
+      login,
+      accessToken,
+      refreshToken,
+    },
+  };
+  await dynamoDb.put(params).promise();
+};
+
+export const isFreeLogin = async ({ login }: any) => {
+  let isFreeLogin: boolean;
+  var params = {
+    TableName: "users",
+    IndexName: "login_index",
+    KeyConditionExpression: "#login = :login",
+    ExpressionAttributeNames: {
+      "#login": "login",
+    },
+    ExpressionAttributeValues: {
+      ":login": login,
+    },
+  };
+
+  let queryParams = await dynamoDb.query(params).promise();
+  if (queryParams?.Count && queryParams?.Count > 0) {
+    isFreeLogin = false;
+  } else {
+    isFreeLogin = true;
+  }
+  return isFreeLogin;
+};
+
+export const getUserByAccessToken = async ({ token }: { token: string }) => {
+  const params = {
+    TableName: "users",
+    IndexName: "accessToken_index",
+    KeyConditionExpression: "#accessToken = :accessToken",
+    ExpressionAttributeNames: {
+      "#accessToken": "accessToken",
+    },
+    ExpressionAttributeValues: {
+      ":accessToken": token,
+    },
+  };
+
+  let queryResult = await dynamoDb.query(params).promise();
+  console.log("queryParams", queryResult);
+  if (queryResult?.Items && queryResult?.Items?.length > 0) {
+    return queryResult?.Items[0];
+  }
+};
+interface Type_UpdateData {
+  tableName?: string;
+  oldRefreshToken: string;
+  refreshToken: string;
+  accessToken: string;
+}
+
+export const updateTokensPair = async ({
+  tableName = "users",
+  oldRefreshToken,
+  refreshToken,
+  accessToken,
+}: Type_UpdateData) => {
+  let postsObject, newIndexJson;
+
+  /*   const params = {
+    TableName: "users",
+    IndexName: "refreshToken-index",
+    Key: {
+      refreshToken: oldRefreshToken,
+    },
+    KeyConditionExpression: "#refreshToken = :oldRefreshToken",
+    UpdateExpression: "set accessToken = :accessToken",
+    ExpressionAttributeValues: {
+      ":accessToken": "accessToken",
+      ":refreshToken": "refreshToken",
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const results = await dynamoDb.update(params).promise(); */
+};
+
+export const deleteTable = ({ tableName = "users" }) => {
+  dynamoDbTable.deleteTable({ TableName: tableName }, function (err, data) {
+    if (err) {
+      console.error(
+        "Unable to delete table. Error JSON:",
+        JSON.stringify(err, null, 2)
+      );
+    } else {
+      console.log(
+        "Deleted table. Table description JSON:",
+        JSON.stringify(data, null, 2)
+      );
+    }
+  });
+};
