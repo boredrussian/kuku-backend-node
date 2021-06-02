@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import {
   register,
   isUniqLogin,
-  getUser,
+  getUserByToken,
   login,
   sessionProof,
 } from "./utilities";
@@ -49,7 +49,16 @@ export default [
     method: "post",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
-        getUser(req, res, next);
+        getUserByToken(req, res, next);
+      },
+    ],
+  },
+  {
+    path: "/api/user",
+    method: "post",
+    handler: [
+      (req: Request, res: Response, next: NextFunction): void => {
+        // getUser(req, res, next);
       },
     ],
   },

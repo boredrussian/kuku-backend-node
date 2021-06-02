@@ -51,6 +51,6 @@ export const isUniqLogin = async (
   next: NextFunction
 ) => {
   const data = req.body;
-  const isLoginExist = await isFreeLogin({ login: data.login });
+  const isLoginExist = await isFreeLogin({ login: data.login, next });
   res.send({ isFreeLogin: isLoginExist });
 };

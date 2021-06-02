@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import createError from "http-errors";
 import {
   getUserByLogin,
   createTable,
@@ -18,31 +19,38 @@ export const login = async (
   if (!req.body.login) {
     res.send("Data is invalid!");
   }
-  let user, serverEphemeralSecret;
+  let serverEphemeralSecret, user;
+  try {
+    user = await getUserByLogin({ login: req.body.login });
+    if (!user) {
+      return;
+    }
+  } catch (e) {
+    console.warn("[login--1]", e);
+    return next(createError(404, "Login or password is invalid"));
+  }
 
-  const userRes = await getUserByLogin({ login: req.body.login });
-
-  if (userRes.Items && userRes.Items.length > 0) {
-    user = userRes.Items[0];
-    const serverEphemeral = srp.generateEphemeral(user.verifier);
+  try {
+    const serverEphemeral = srp.generateEphemeral(user?.verifier);
     serverEphemeralSecret = serverEphemeral.secret;
     const loginDataSecondStep = {
       serverPublicEphemeral: serverEphemeral.public,
       salt: user.salt,
     };
     res.send(loginDataSecondStep);
-  } else {
-    res.send({ errorMessage: "Login or password is invalid" });
+  } catch (e) {
+    console.warn("[login--2]", e);
+    return next(createError(403, "SRP error generate serverEphemeral"));
   }
 
-  const data = {};
   try {
     const resUpdate = updateUser_AddEphemeralSecret({
       address: user?.address,
       serverEphemeralSecret: serverEphemeralSecret as string,
     });
   } catch (e) {
-    console.warn("[login]", e);
+    console.warn("[login--3]", e);
+    return next(createError(403, "SRP error add ephemeral secret"));
   }
 };
 
@@ -53,11 +61,10 @@ export const sessionProof = async (
 ) => {
   // TODO: validation
   //   STORE uniq user login on dynamodb if possible
-  const userData = await getUserByLogin({ login: req.body.login });
   let user;
-  if (userData.Items && userData.Items?.length > 0) {
-    user = userData.Items[0];
-  }
+  try {
+    user = await getUserByLogin({ login: req.body.login });
+  } catch (e) {}
   const clientSessionProof = req.body.clientSessionProof;
   const clientEphemeralPublic = req.body.clientEphemeralPublic;
   const login = req.body.login;

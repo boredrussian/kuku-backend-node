@@ -2,6 +2,8 @@ import AWS from "aws-sdk";
 import { Request, Response, NextFunction } from "express";
 import stringify from "fast-json-stable-stringify";
 import parseJson from "parse-json";
+import { getJSDocReturnTag } from "typescript";
+import createError from "http-errors";
 
 /**
  * Table Index schema {
@@ -147,11 +149,15 @@ export const getUserByLogin = async ({ login }: { login: string }) => {
       ":login": login,
     },
   };
-  return await dynamoDb.query(params).promise();
+  const userResData = await dynamoDb.query(params).promise();
+
+  if (userResData.Items && userResData.Items.length > 0) {
+    return userResData.Items[0];
+  }
 };
 
-export const isFreeLogin = async ({ login }: any) => {
-  let isFreeLogin: boolean;
+export const isFreeLogin = async ({ login, next }: any) => {
+  let isFreeLogin: boolean, user;
   const params = {
     TableName: "users",
     IndexName: "login_index",
@@ -164,15 +170,18 @@ export const isFreeLogin = async ({ login }: any) => {
     },
   };
 
-  // let queryParams = await dynamoDb.query(params).promise();
-
-  const user = await getUserByLogin({ login: login });
-  if (user?.Count && user?.Count > 0) {
-    isFreeLogin = false;
-  } else {
-    isFreeLogin = true;
+  try {
+    user = await getUserByLogin({ login: login });
+    if (user) {
+      isFreeLogin = false;
+    } else {
+      isFreeLogin = true;
+    }
+    return isFreeLogin;
+  } catch (e) {
+    console.warn("isFreeLogin", e);
+    return next(createError(403, "Error is free login"));
   }
-  return isFreeLogin;
 };
 
 export const getUserByAccessToken = async ({ token }: { token: string }) => {
@@ -189,7 +198,6 @@ export const getUserByAccessToken = async ({ token }: { token: string }) => {
   };
 
   let queryResult = await dynamoDb.query(params).promise();
-  console.log("queryParams", queryResult);
   if (queryResult?.Items && queryResult?.Items?.length > 0) {
     return queryResult?.Items[0];
   }
