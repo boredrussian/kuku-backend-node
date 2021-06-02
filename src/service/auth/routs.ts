@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { register, isUniqLogin } from "./utilities/register";
-import { getUser, getTokensPair } from "./utilities/getUser";
+import {
+  register,
+  isUniqLogin,
+  getUser,
+  login,
+  sessionProof,
+} from "./utilities";
 
 export default [
   {
@@ -9,7 +14,6 @@ export default [
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
         register(req, res, next);
-        // res.send("OK");
       },
     ],
   },
@@ -27,8 +31,16 @@ export default [
     method: "post",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
-        res.send("OK");
-        register(req, res, next);
+        login(req, res, next);
+      },
+    ],
+  },
+  {
+    path: "/api/login/session-proof",
+    method: "post",
+    handler: [
+      (req: Request, res: Response, next: NextFunction): void => {
+        sessionProof(req, res, next);
       },
     ],
   },
@@ -37,18 +49,7 @@ export default [
     method: "post",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
-        console.log("+++++++++++++++++ki++++++++++++++++++++++++++++++");
-
         getUser(req, res, next);
-      },
-    ],
-  },
-  {
-    path: "/api/tokens-pair",
-    method: "post",
-    handler: [
-      (req: Request, res: Response, next: NextFunction): void => {
-        getTokensPair(req, res, next);
       },
     ],
   },

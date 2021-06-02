@@ -108,7 +108,6 @@ interface Type_PutData {
   verifier: string;
   login: string;
   accessToken: string;
-  refreshToken: string;
 }
 
 export const putData = async ({
@@ -120,7 +119,6 @@ export const putData = async ({
   verifier,
   login,
   accessToken,
-  refreshToken,
 }: Type_PutData) => {
   const params = {
     TableName: tableName,
@@ -132,15 +130,29 @@ export const putData = async ({
       verifier,
       login,
       accessToken,
-      refreshToken,
     },
   };
   await dynamoDb.put(params).promise();
 };
 
+export const getUserByLogin = async ({ login }: { login: string }) => {
+  const params = {
+    TableName: "users",
+    IndexName: "login_index",
+    KeyConditionExpression: "#login = :login",
+    ExpressionAttributeNames: {
+      "#login": "login",
+    },
+    ExpressionAttributeValues: {
+      ":login": login,
+    },
+  };
+  return await dynamoDb.query(params).promise();
+};
+
 export const isFreeLogin = async ({ login }: any) => {
   let isFreeLogin: boolean;
-  var params = {
+  const params = {
     TableName: "users",
     IndexName: "login_index",
     KeyConditionExpression: "#login = :login",
@@ -152,8 +164,10 @@ export const isFreeLogin = async ({ login }: any) => {
     },
   };
 
-  let queryParams = await dynamoDb.query(params).promise();
-  if (queryParams?.Count && queryParams?.Count > 0) {
+  // let queryParams = await dynamoDb.query(params).promise();
+
+  const user = await getUserByLogin({ login: login });
+  if (user?.Count && user?.Count > 0) {
     isFreeLogin = false;
   } else {
     isFreeLogin = true;
@@ -180,37 +194,60 @@ export const getUserByAccessToken = async ({ token }: { token: string }) => {
     return queryResult?.Items[0];
   }
 };
-interface Type_UpdateData {
+interface Type_UpdateUser_AddEphemeralSecret {
   tableName?: string;
-  oldRefreshToken: string;
-  refreshToken: string;
-  accessToken: string;
+  address: string;
+  serverEphemeralSecret: string;
 }
 
-export const updateTokensPair = async ({
+// updateUserByAddress
+// updateUserAddEphemeralSecret
+export const updateUser_AddEphemeralSecret = async ({
   tableName = "users",
-  oldRefreshToken,
-  refreshToken,
-  accessToken,
-}: Type_UpdateData) => {
-  let postsObject, newIndexJson;
-
-  /*   const params = {
+  address,
+  serverEphemeralSecret,
+}: Type_UpdateUser_AddEphemeralSecret) => {
+  const params = {
     TableName: "users",
-    IndexName: "refreshToken-index",
     Key: {
-      refreshToken: oldRefreshToken,
+      address: address,
     },
-    KeyConditionExpression: "#refreshToken = :oldRefreshToken",
-    UpdateExpression: "set accessToken = :accessToken",
+    UpdateExpression: "set serverEphemeralSecret = :serverEphemeralSecret",
     ExpressionAttributeValues: {
-      ":accessToken": "accessToken",
-      ":refreshToken": "refreshToken",
+      ":serverEphemeralSecret": serverEphemeralSecret,
     },
     ReturnValues: "ALL_NEW",
   };
 
-  const results = await dynamoDb.update(params).promise(); */
+  const result = await dynamoDb.update(params).promise();
+  return result;
+};
+
+interface Type_UpdateUser_ServerSessionProof {
+  tableName?: string;
+  address: string;
+  serverSessionProof: string;
+}
+
+export const updateUser_ServerSessionProof = async ({
+  tableName = "users",
+  address,
+  serverSessionProof,
+}: Type_UpdateUser_ServerSessionProof) => {
+  const params = {
+    TableName: "users",
+    Key: {
+      address: address,
+    },
+    UpdateExpression: "set serverSessionProof = :serverSessionProof",
+    ExpressionAttributeValues: {
+      ":serverSessionProof": serverSessionProof,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const result = await dynamoDb.update(params).promise();
+  return result;
 };
 
 export const deleteTable = ({ tableName = "users" }) => {

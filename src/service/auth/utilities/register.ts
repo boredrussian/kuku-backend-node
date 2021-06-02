@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import {
-  //   createTable,
   createTable,
   putData,
   isFreeLogin,
@@ -20,8 +19,6 @@ export const register = async (
   const data = req.body;
 
   const accessToken = makeToken({ type: "access" });
-  const refreshToken = makeToken({ type: "refresh" });
-
   try {
     await putData({
       tableName: "users",
@@ -32,11 +29,9 @@ export const register = async (
       verifier: data.verifier,
       login: data.login,
       accessToken,
-      refreshToken,
     });
 
     const resData = {
-      refreshToken,
       accessToken,
       address: data.address,
       name: data.login,
