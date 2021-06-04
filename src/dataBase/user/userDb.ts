@@ -185,6 +185,7 @@ export const isFreeLogin = async ({ login, next }: any) => {
 };
 
 export const getUserByAccessToken = async ({ token }: { token: string }) => {
+  console.log("============token============", token);
   const params = {
     TableName: "users",
     IndexName: "accessToken_index",
@@ -198,6 +199,8 @@ export const getUserByAccessToken = async ({ token }: { token: string }) => {
   };
 
   let queryResult = await dynamoDb.query(params).promise();
+  console.log("--------queryResult----------", queryResult);
+
   if (queryResult?.Items && queryResult?.Items?.length > 0) {
     return queryResult?.Items[0];
   }
@@ -250,6 +253,33 @@ export const updateUser_ServerSessionProof = async ({
     UpdateExpression: "set serverSessionProof = :serverSessionProof",
     ExpressionAttributeValues: {
       ":serverSessionProof": serverSessionProof,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const result = await dynamoDb.update(params).promise();
+  return result;
+};
+
+interface Type_UpdateUser_AccessToken {
+  tableName?: string;
+  address: string;
+  accessToken: string;
+}
+
+export const updateUser_AccessToken = async ({
+  tableName = "users",
+  address,
+  accessToken,
+}: Type_UpdateUser_AccessToken) => {
+  const params = {
+    TableName: "users",
+    Key: {
+      address: address,
+    },
+    UpdateExpression: "set accessToken = :accessToken",
+    ExpressionAttributeValues: {
+      ":accessToken": accessToken,
     },
     ReturnValues: "ALL_NEW",
   };

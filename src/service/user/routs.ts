@@ -5,6 +5,7 @@ import {
   getUserByToken,
   login,
   sessionProof,
+  getUserRegister,
 } from "./utilities";
 
 export default [
@@ -58,7 +59,7 @@ export default [
     method: "post",
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
-        // getUser(req, res, next);
+        getUserRegister(req, res, next);
       },
     ],
   },

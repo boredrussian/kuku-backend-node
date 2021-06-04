@@ -14,8 +14,8 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-  //   deleteTable({});
-  //   createTable({});
+  // deleteTable({});
+  // createTable({});
   if (!req.body.login) {
     res.send("Data is invalid!");
   }
@@ -64,7 +64,9 @@ export const sessionProof = async (
   let user;
   try {
     user = await getUserByLogin({ login: req.body.login });
-  } catch (e) {}
+  } catch (e) {
+    return next(createError(403, "[sessionProof][error user not found]"));
+  }
   const clientSessionProof = req.body.clientSessionProof;
   const clientEphemeralPublic = req.body.clientEphemeralPublic;
   const login = req.body.login;
