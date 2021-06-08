@@ -27,21 +27,21 @@ Resources:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-         - Effect: Allow
-           Principal:
-             Service:
-             - apigateway.amazonaws.com
-           Action:
-            - sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
       Policies:
-       - PolicyName: PublicAPIPolicy
-         PolicyDocument:
-           Version: 2012-10-17
-           Statement:
-            - Effect: Allow
-              Action:
-                - "dynamodb:Query"
-              Resource: !GetAtt IndexTable.Arn
+        - PolicyName: PublicAPIPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:Query"
+                Resource: !GetAtt IndexTable.Arn
   Api:
     Type: AWS::Serverless::Api
     Properties:
@@ -57,15 +57,15 @@ Resources:
           Parameters:
             Location: index-openapi.yaml
   LambdaLayer:
-        Type: AWS::Serverless::LayerVersion
-        Properties:
-            LayerName: signed-lambda-layer
-            Description: Dependencies for signed.移动
-            ContentUri: lambda-layer/
-            CompatibleRuntimes:
-              - nodejs14.x
-            LicenseInfo: 'MIT'
-            RetentionPolicy: Retain
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: signed-lambda-layer
+      Description: Dependencies for signed.移动
+      ContentUri: lambda-layer/
+      CompatibleRuntimes:
+        - nodejs14.x
+      LicenseInfo: "MIT"
+      RetentionPolicy: Retain
 Outputs:
   IndexUrl:
     Description: Public Index URL
