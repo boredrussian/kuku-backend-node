@@ -21,7 +21,7 @@ export default [
     handler: [
       (req: Request, res: Response, next: NextFunction): void => {
         savePost(req, res, next);
-        res.send("OK");
+        // res.send("OK");
       },
     ],
   },

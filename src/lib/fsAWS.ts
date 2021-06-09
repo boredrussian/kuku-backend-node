@@ -26,7 +26,7 @@ interface TypePut {
 /* Key: `public/file_storage/${folders.first}/${folders.second}/${hash}.json`,
 ContentType: "application/json", */
 
-export const putObjectS3 = ({
+export const putObjectS3 = async ({
   bucket = process.env.AWS_BASKET || "",
   key,
   data,
@@ -38,6 +38,14 @@ export const putObjectS3 = ({
     Body: data,
     ContentType: type,
   };
+
+  console.log("params", params);
+
+  /*   try {
+    await s3.client.putObject(params).promise();
+  } catch (e) {
+    console.warn("putObject-error", e);
+  } */
 
   s3.putObject(params, function (err, data) {
     if (err) {
