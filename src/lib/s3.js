@@ -16,12 +16,7 @@ const s3 = new AWS.S3();
  });
   */
 
-interface TypePut {
-  bucket?: string;
-  key: string;
-  data: any;
-  type: string;
-}
+
 
 /* Key: `public/file_storage/${folders.first}/${folders.second}/${hash}.json`,
 ContentType: "application/json", */
@@ -31,7 +26,7 @@ export const putObjectS3 = async ({
   key,
   data,
   type,
-}: TypePut) => {
+}) => {
   const params = {
     Bucket: bucket,
     Key: key,

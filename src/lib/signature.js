@@ -1,8 +1,10 @@
-import stringify from "fast-json-stable-stringify";
-import sortKeys from "sort-keys";
-import * as bitcoinMessage from "bitcoinjs-message";
+const bitcoinMessage = require("bitcoinjs-message");
+const sortKeys = require("sort-keys");
+const stringify = require("fast-json-stable-stringify");
 
-const getPostJsonFromObj = (post: any) => {
+
+
+const getPostJsonFromObj = (post) => {
   let postCopy = JSON.parse(JSON.stringify(post));
   if (postCopy.hash || postCopy.signatures) {
     delete postCopy.hash;
@@ -12,13 +14,14 @@ const getPostJsonFromObj = (post: any) => {
   return stringify(postCopy);
 };
 
-export const isPostValid = (post: any) => {
+module.exports.isPostValid = ({ post }) => {
+  console.log('post', post);
   const { address } = post.source;
   const { signatures } = post;
-  const message = getPostJsonFromObj(post);
+  // const message = getPostJsonFromObj(post);
   let isValid;
   try {
-    isValid = bitcoinMessage.verify(message, address, signatures);
+    // isValid = bitcoinMessage.verify(message, address, signatures);
   } catch (e) {
     console.log("[isPostValid]", e);
     isValid = false;

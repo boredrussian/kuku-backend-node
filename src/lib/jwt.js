@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+const jwt = require('jsonwebtoken');
 
 /**
  * expiresIn: 86400, in milliseconds second - 24 hours
@@ -12,16 +12,13 @@ const expiredTimeMap = {
   refresh: 86400 * 30,
 };
 
-type EnumType = "access" | "refresh";
-interface TypeType {
-  type: EnumType;
-}
 
-export const makeToken = ({ type }: TypeType): string => {
+
+export const makeToken = ({ type }) => {
   let jwtToken = "";
 
   try {
-    jwtToken = jwt.sign({ type: type }, process.env.JWT_SECRET as string, {
+    jwtToken = jwt.sign({ type: type }, process.env.JWT_SECRET, {
       expiresIn: expiredTimeMap[type],
     });
   } catch (e) {
@@ -31,7 +28,7 @@ export const makeToken = ({ type }: TypeType): string => {
   return jwtToken;
 };
 
-export const verifyToken = ({ token }: { token: string }) => {
+export const verifyToken = ({ token }) => {
   let isVerify = false;
 
   console.log("token____________4343________", token);
@@ -41,7 +38,7 @@ export const verifyToken = ({ token }: { token: string }) => {
   );
 
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     if (decodedToken) {
       isVerify = true;
     }
