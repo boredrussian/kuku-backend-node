@@ -1,19 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'singed
-
-  Sample SAM Template for singed
+Description: 'singed Sample SAM Template for singed
 
   '
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 60
 Resources:
   SavePostFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: SavePostFunction
-      Handler: app.lambdaHandler
+      Handler: service/fileStorage/savePost/app.lambdaHandler
       Runtime: nodejs14.x
       Role: arn:aws:iam::164620743841:role/lambda-execution-role
       Environment:

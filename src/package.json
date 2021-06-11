@@ -1,16 +1,13 @@
 {
-  "name": "save_post",
+  "name": "hello_world",
   "version": "1.0.0",
-  "description": "save post function",
-  "main": "app.js",
+  "description": "hello world sample for NodeJS",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {},
-  "scripts": {
-    "test": "mocha tests/unit/"
-  },
   "devDependencies": {
+    "aws-sdk": "^2.815.0",
     "chai": "^4.2.0",
     "mocha": "^8.2.1"
   }
