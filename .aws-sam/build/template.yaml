@@ -6,6 +6,12 @@ Description: 'singed Sample SAM Template for singed
 Globals:
   Function:
     Timeout: 60
+  Api:
+    Cors:
+      AllowMethods: '''GET,POST,OPTIONS'''
+      AllowHeaders: '''content-type'''
+      AllowOrigin: '''*'''
+      AllowCredentials: '''*'''
 Resources:
   SavePostFunction:
     Type: AWS::Serverless::Function

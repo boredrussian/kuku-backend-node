@@ -1,7 +1,7 @@
 // const url = 'http://checkip.amazonaws.com/';
 const AWS = require('aws-sdk');
 const parseJson = require("parse-json");
-const { isPostValid } = require('./utilities/isPostValid');
+// const { isPostValid } = require('./utilities/isPostValid');
 const { putFile } = require('./utilities/putFile');
 const { updateIndex } = require('./utilities/updateIndex');
 
@@ -14,18 +14,18 @@ exports.lambdaHandler = async (event, context) => {
         console.warn('savePost', e)
     }
 
-    try {
+  /*   try {
         isValid = isPostValid({ post });
     } catch (e) {
         isValid = false;
         // TODO add error response
         return;
-    }
+    } */
 
     if (isValid) {
         await putFile({ post });
         if (isAddToIndex) {
-            updateIndex(post);
+            await updateIndex({ post });
         }
     }
 
