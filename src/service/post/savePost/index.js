@@ -1,32 +1,33 @@
- 
-const AWS = require('aws-sdk');
+const { putFile } = require('./utilities/putFile');
+const { updateIndex } = require('./utilities/updateIndex');
+const { checkIsPostValid } = require('./utilities/isPostValid');
 const parseJson = require("parse-json");
- const { getIndex } = require('./utilities/getIndex');
 
-
-exports.lambdaHandler = async (event, context) => {
-    let response, post, isAddToIndex, isValid = true;
+exports.savePost = async ({ event }) => {
+    let response, post, addToIndex, isValid = true;
+    
     try {
-        ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
-    }
-    catch (e) {
-        console.warn('savePost', e)
+        const body = parseJson(event.body);
+        ({ post, addToIndex } = body);
+    } catch (e) {
+        console.warn('[savePost][parseJson]', e)
     }
 
     /*   try {
-          isValid = isPostValid({ post });
+          isValid = checkIsPostValid({ post });
+          console.log('isValid', isValid)
       } catch (e) {
           isValid = false;
           // TODO add error response
           return;
       } */
 
-    /*    if (isValid) {
-           await getIndex({ post });
-           if (isAddToIndex) {
-               await updateIndex({ post });
-           }
-       } */
+    if (isValid) {
+        await putFile({ post });
+        if (addToIndex) {
+            await updateIndex({ post });
+        }
+    }
 
     try {
         response = {
@@ -35,7 +36,7 @@ exports.lambdaHandler = async (event, context) => {
             "Access-Control-Allow-Credentials": true,
             "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,OPTIONS",
             'body': JSON.stringify({
-                message: 'Ok get',
+                message: 'Ok',
             })
         }
     } catch (err) {

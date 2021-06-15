@@ -1,50 +1,35 @@
 // const url = 'http://checkip.amazonaws.com/';
-const AWS = require('aws-sdk');
-const parseJson = require("parse-json");
-const { isPostValid } = require('./utilities/isPostValid');
 const { putFile } = require('./utilities/putFile');
 const { updateIndex } = require('./utilities/updateIndex');
+const { checkIsPostValid } = require('./utilities/isPostValid');
 
-exports.lambdaHandler = async (event, context) => {
+exports.savePost = async (event) => {
     let response, post, isAddToIndex, isValid = true;
-    try {
-        ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
-    }
-    catch (e) {
-        console.warn('savePost', e)
-    }
-
-    // try {
-    //     isValid = isPostValid({ post });
-    // } catch (e) {
-    //     isValid = false;
-    //     // TODO add error response
-    //     return;
-    // }
-
-
+    const { post, addToIndex } = event.body;
+    /*   try {
+          isValid = checkIsPostValid({ post });
+          console.log('isValid', isValid)
+      } catch (e) {
+          isValid = false;
+          // TODO add error response
+          return;
+      } */
 
     if (isValid) {
         await putFile({ post });
-        if (isAddToIndex) {
-            console.log('isPostValid Box')
-           await updateIndex({post});
+        if (addToIndex) {
+            await updateIndex({ post });
         }
     }
 
     try {
         response = {
             'statusCode': 200,
-             headers: {
-            "Content-Type" : "application/json",
-            "Access-Control-Allow-Headers" : "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-            "Access-Control-Allow-Methods" : "OPTIONS,POST,GET",
-            "Access-Control-Allow-Credentials" : true,
-            "Access-Control-Allow-Origin" : "*",
-            "X-Requested-With" : "*"
-        },
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": true,
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,OPTIONS",
             'body': JSON.stringify({
-                message: 'Oks',
+                message: 'Ok',
             })
         }
     } catch (err) {

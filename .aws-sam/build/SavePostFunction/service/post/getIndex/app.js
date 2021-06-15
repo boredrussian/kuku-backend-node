@@ -1,13 +1,17 @@
-// const url = 'http://checkip.amazonaws.com/';
+ 
 const AWS = require('aws-sdk');
 const parseJson = require("parse-json");
-// const { isPostValid } = require('./utilities/isPostValid');
-const { putFile } = require('./utilities/putFile');
-const { updateIndex } = require('./utilities/updateIndex');
+ const { getIndex } = require('./utilities/getIndex');
+
 
 exports.lambdaHandler = async (event, context) => {
     let response, post, isAddToIndex, isValid = true;
-
+    try {
+        ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
+    }
+    catch (e) {
+        console.warn('savePost', e)
+    }
 
     /*   try {
           isValid = isPostValid({ post });
@@ -17,21 +21,21 @@ exports.lambdaHandler = async (event, context) => {
           return;
       } */
 
-    if (isValid) {
-        await putFile({ post });
-        if (isAddToIndex) {
-            await updateIndex({ post });
-        }
-    }
+    /*    if (isValid) {
+           await getIndex({ post });
+           if (isAddToIndex) {
+               await updateIndex({ post });
+           }
+       } */
 
     try {
         response = {
             'statusCode': 200,
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Allow-Credentials": true,
-            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,OPTIONS",
             'body': JSON.stringify({
-                message: 'Ok',
+                message: 'Ok get',
             })
         }
     } catch (err) {

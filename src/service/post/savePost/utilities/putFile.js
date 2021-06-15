@@ -1,39 +1,9 @@
-const AWS = require("aws-sdk");
 const stringify = require('fast-json-stable-stringify');
-const { config } = require("/opt/nodejs/config");
-
-AWS.config.update({
-    region: config.region,
-});
-const s3 = new AWS.S3();
+// const { config } = require("/opt/nodejs/config");
+const { config } = require("../../../../config");
+const { putObjectS3 } = require("../../../../lib/s3");
 
  
-
-const putObjectS3 = async ({
-    bucket,
-    key,
-    data,
-    type,
-}) => {
-    let res;
-    const params = {
-        Bucket: bucket,
-        Key: key,
-        Body: data,
-        ContentType: type,
-    };
-
-    console.log("params", params);
-
-    try {
-        res = await s3.putObject(params).promise();
-    } catch (e) {
-        console.warn("putObjectS3-error", e);
-    }
-    return res;
-
-};
-
 const getFoldersName = (hash) => {
     return {
         first: hash.slice(0, 2),

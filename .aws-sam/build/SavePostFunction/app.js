@@ -1,44 +1,36 @@
 // const url = 'http://checkip.amazonaws.com/';
-const AWS = require('aws-sdk');
-const parseJson = require("parse-json");
-// const { isPostValid } = require('./utilities/isPostValid');
-const { putFile } = require('./utilities/putFile');
+const { savePost } = require('./service/post/savePost');
 const { updateIndex } = require('./utilities/updateIndex');
+const { checkIsPostValid } = require('./utilities/isPostValid');
+const { configApi } = require('./config');
+
+
 
 exports.lambdaHandler = async (event, context) => {
-    let response, post, isAddToIndex, isValid = true;
-    try {
-        ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
-    }
-    catch (e) {
-        console.warn('savePost', e)
+    let response;
+    const { method, path } = event.requestContext.http.method;
+    const notFoundResponse = {
+        'statusCode': 404,
+    };
+
+    console.log('method', method);
+    console.log('path', patch);
+
+    switch (path) {
+        case configApi.savePost.path:
+            response = savePost({ event });
+        /*       case configApi.getIndex.path:
+                  response = getIndex({ event });
+              case configApi.register.path:
+                  response = register({ event });
+              case configApi.auth.path:
+                  response = auth({ event }); */
+        default:
+            response = notFoundResponse;
     }
 
-  /*   try {
-        isValid = isPostValid({ post });
-    } catch (e) {
-        isValid = false;
-        // TODO add error response
-        return;
-    } */
-
-    if (isValid) {
-        await putFile({ post });
-        if (isAddToIndex) {
-            await updateIndex({ post });
-        }
-    }
-
-    try {
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'Oks',
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
+    if (!response) {
+        response = notFoundResponse;
     }
 
     return response
