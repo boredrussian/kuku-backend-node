@@ -9,17 +9,17 @@ Globals:
   Function:
     Timeout: 60
   Api:
-        Cors:
-          AllowMethods: "'GET,POST,OPTIONS'"
-          AllowHeaders: "'content-type'"
-          AllowOrigin: "'*'"
-          AllowCredentials: "'*'"
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
 Resources:
   SavePostFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: src/
-      Handler: service/fileStorage/savePost/app.lambdaHandler
+      Handler: service/post/savePost/app.lambdaHandler
       Runtime: nodejs14.x
       Role: arn:aws:iam::164620743841:role/lambda-execution-role # Pre-existing role
       Environment:
@@ -34,6 +34,26 @@ Resources:
           Properties:
             Path: /post
             Method: post
+
+  GetIndexFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: service/post/getIndex/app.lambdaHandler
+      Runtime: nodejs14.x
+      Role: arn:aws:iam::164620743841:role/lambda-execution-role # Pre-existing role
+      Environment:
+        Variables:
+          TEST_2: Value345
+      Layers:
+        - !Ref DepLayer
+        - !Ref ConfigLayer
+      Events:
+        SavePost:
+          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /book
+            Method: get
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion

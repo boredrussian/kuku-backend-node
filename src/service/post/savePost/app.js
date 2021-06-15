@@ -7,12 +7,7 @@ const { updateIndex } = require('./utilities/updateIndex');
 
 exports.lambdaHandler = async (event, context) => {
     let response, post, isAddToIndex, isValid = true;
-    try {
-        ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
-    }
-    catch (e) {
-        console.warn('savePost', e)
-    }
+
 
     /*   try {
           isValid = isPostValid({ post });
@@ -36,7 +31,7 @@ exports.lambdaHandler = async (event, context) => {
             "Access-Control-Allow-Credentials": true,
             "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
             'body': JSON.stringify({
-                message: 'Oks',
+                message: 'Ok',
             })
         }
     } catch (err) {

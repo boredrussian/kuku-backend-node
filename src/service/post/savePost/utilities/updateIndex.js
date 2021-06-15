@@ -3,6 +3,7 @@ const { config } = require('/opt/nodejs/config');
 const stringify = require("fast-json-stable-stringify");
 const parseJson = require("parse-json");
 
+
 AWS.config.update({
     region: config.region,
 });
@@ -40,7 +41,7 @@ let index;
     
     
     try{
-     const params = {
+        const params = {
     TableName: tableName,
     Item: {
       address: post.source.address,
@@ -101,7 +102,7 @@ const updateIndexDb = async ({
     ReturnValues: "ALL_NEW",
   };
 
-  const results = await dynamoDb.update(params).promise();
+   await dynamoDb.update(params).promise();
 };
 
 
@@ -109,7 +110,7 @@ exports.updateIndex = async ({ post }) => {
    let currentIndex;
      try {
      currentIndex = await getIndex({ tableName: config.indexTableName, address: post.source.address });
-     console.log('datadd', currentIndex)
+     console.log('datadd', currentIndex);
      
     } catch (e) {
         console.warn("[updateIndex][getIndex]", e);
@@ -123,7 +124,7 @@ if(!currentIndex){
              post}); 
     }
     catch(e){
-        console.warn('[updateIndex][putFirstData]',e)
+        console.warn('[updateIndex][putFirstData]',e);
     }
     
 }else {
