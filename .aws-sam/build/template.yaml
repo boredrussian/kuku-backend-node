@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'singed Sample SAM Template for singed
+
+  '
+Globals:
+  Function:
+    Timeout: 60
+  Api:
+    Cors:
+      AllowMethods: '''GET,POST,OPTIONS'''
+      AllowHeaders: '''content-type'''
+      AllowOrigin: '''*'''
+      AllowCredentials: '''*'''
+Resources:
+  SavePostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SavePostFunction
+      Handler: service/fileStorage/savePost/app.lambdaHandler
+      Runtime: nodejs14.x
+      Role: arn:aws:iam::164620743841:role/lambda-execution-role
+      Environment:
+        Variables:
+          TEST_2: Value345
+      Layers:
+      - Ref: DepLayer
+      - Ref: ConfigLayer
+      Events:
+        SavePost:
+          Type: HttpApi
+          Properties:
+            Path: /post
+            Method: post
+  DepLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: singed-app-dependencies
+      Description: Dependencies for  singed-app
+      ContentUri: ..\..\dependencies
+      CompatibleRuntimes:
+      - nodejs14.x
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+  ConfigLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: singed-app-config
+      Description: Config for  singed-app
+      ContentUri: ..\..\config
+      CompatibleRuntimes:
+      - nodejs14.x
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+Outputs:
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/

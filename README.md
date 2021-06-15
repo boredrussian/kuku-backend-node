@@ -1,1 +1,1 @@
-# kuku-backend-node
+# kuku-aws-backend-node
