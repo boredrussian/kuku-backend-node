@@ -9,8 +9,6 @@ exports.updateIndex = async ({ post }) => {
   let currentIndex;
   try {
     currentIndex = await getIndex({ tableName: config.indexTableName, address: post.source.address });
-    console.log('datadd', currentIndex);
-
   } catch (e) {
     console.warn("[updateIndex][getIndex]", e);
   }

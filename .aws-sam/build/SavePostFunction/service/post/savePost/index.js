@@ -1,11 +1,18 @@
-// const url = 'http://checkip.amazonaws.com/';
 const { putFile } = require('./utilities/putFile');
 const { updateIndex } = require('./utilities/updateIndex');
 const { checkIsPostValid } = require('./utilities/isPostValid');
+const parseJson = require("parse-json");
 
-exports.savePost = async (event) => {
-    let response, post, isAddToIndex, isValid = true;
-    const { post, addToIndex } = event.body;
+exports.savePost = async ({ event }) => {
+    let response, post, addToIndex, isValid = true;
+    
+    try {
+        const body = parseJson(event.body);
+        ({ post, addToIndex } = body);
+    } catch (e) {
+        console.warn('[savePost][parseJson]', e)
+    }
+
     /*   try {
           isValid = checkIsPostValid({ post });
           console.log('isValid', isValid)

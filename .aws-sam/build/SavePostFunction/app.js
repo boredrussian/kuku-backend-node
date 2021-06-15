@@ -1,24 +1,17 @@
-// const url = 'http://checkip.amazonaws.com/';
 const { savePost } = require('./service/post/savePost');
-const { updateIndex } = require('./utilities/updateIndex');
-const { checkIsPostValid } = require('./utilities/isPostValid');
 const { configApi } = require('./config');
-
 
 
 exports.lambdaHandler = async (event, context) => {
     let response;
-    const { method, path } = event.requestContext.http.method;
+    const { method, path } = event.requestContext.http;
     const notFoundResponse = {
         'statusCode': 404,
     };
 
-    console.log('method', method);
-    console.log('path', patch);
-
     switch (path) {
         case configApi.savePost.path:
-            response = savePost({ event });
+            response = await savePost({ event });
         /*       case configApi.getIndex.path:
                   response = getIndex({ event });
               case configApi.register.path:

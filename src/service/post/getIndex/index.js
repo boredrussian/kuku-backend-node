@@ -1,10 +1,10 @@
- 
+
 const AWS = require('aws-sdk');
 const parseJson = require("parse-json");
- const { getIndex } = require('./utilities/getIndex');
+const { getIndex } = require('./utilities/getIndex');
 
 
-exports.lambdaHandler = async (event, context) => {
+exports.getIndex = async ({ event }) => {
     let response, post, isAddToIndex, isValid = true;
     try {
         ({ post, addToIndex: isAddToIndex } = parseJson(event.body));
@@ -12,14 +12,6 @@ exports.lambdaHandler = async (event, context) => {
     catch (e) {
         console.warn('savePost', e)
     }
-
-    /*   try {
-          isValid = isPostValid({ post });
-      } catch (e) {
-          isValid = false;
-          // TODO add error response
-          return;
-      } */
 
     /*    if (isValid) {
            await getIndex({ post });

@@ -3,7 +3,6 @@ const stringify = require('fast-json-stable-stringify');
 const { config } = require("../../../../config");
 const { putObjectS3 } = require("../../../../lib/s3");
 
-
  
 const getFoldersName = (hash) => {
     return {

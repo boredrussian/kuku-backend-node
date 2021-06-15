@@ -1,26 +1,27 @@
 const { savePost } = require('./service/post/savePost');
+const { getIndex } = require('./service/post/savePost');
 const { configApi } = require('./config');
 
 
 exports.lambdaHandler = async (event, context) => {
     let response;
-    const { method, path } = event.requestContext.http.method;
+    const { method, path } = event.requestContext.http;
     const notFoundResponse = {
         'statusCode': 404,
     };
 
-    console.log('method', method);
-    console.log('path', patch);
-
     switch (path) {
         case configApi.savePost.path:
-            response = savePost({ event });
-        /*       case configApi.getIndex.path:
-                  response = getIndex({ event });
-              case configApi.register.path:
-                  response = register({ event });
-              case configApi.auth.path:
-                  response = auth({ event }); */
+            response = await savePost({ event });
+            break;
+        case configApi.getIndex.path:
+            response = getIndex({ event });
+            break;
+
+        /*     case configApi.register.path:
+               response = register({ event });
+           case configApi.auth.path:
+               response = auth({ event }); */
         default:
             response = notFoundResponse;
     }
