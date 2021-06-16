@@ -14,5 +14,8 @@ exports.configApi = {
         method: 'get',
         path: '/book'
     },
-
+    register: {
+        method: 'post',
+        path: '/register'
+    },
 }

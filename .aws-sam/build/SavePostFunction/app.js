@@ -1,4 +1,5 @@
 const { savePost } = require('./service/post/savePost');
+const { getIndexService } = require('./service/post/getIndex');
 const { configApi } = require('./config');
 
 
@@ -12,12 +13,15 @@ exports.lambdaHandler = async (event, context) => {
     switch (path) {
         case configApi.savePost.path:
             response = await savePost({ event });
-        /*       case configApi.getIndex.path:
-                  response = getIndex({ event });
-              case configApi.register.path:
-                  response = register({ event });
-              case configApi.auth.path:
-                  response = auth({ event }); */
+            break;
+        case configApi.getIndex.path:
+            response = getIndexService({ event });
+            break;
+
+        /*     case configApi.register.path:
+               response = register({ event });
+           case configApi.auth.path:
+               response = auth({ event }); */
         default:
             response = notFoundResponse;
     }
