@@ -13,10 +13,10 @@ Globals:
       AllowOrigin: '''*'''
       AllowCredentials: '''*'''
 Resources:
-  SavePostFunction:
+  MainFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: SavePostFunction
+      CodeUri: MainFunction
       Handler: /app.lambdaHandler
       Runtime: nodejs14.x
       Role: arn:aws:iam::164620743841:role/lambda-execution-role
@@ -36,6 +36,16 @@ Resources:
           Properties:
             Method: get
             Path: /book
+        Register:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register
+        CheckLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register/checkLogin
   DepLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:

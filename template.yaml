@@ -15,7 +15,7 @@ Globals:
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
 Resources:
-  SavePostFunction:
+  MainFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: src/
@@ -38,6 +38,16 @@ Resources:
           Properties:
             Method: get
             Path: /book
+        Register:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register
+        CheckLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register/checkLogin
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion

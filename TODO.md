@@ -11,3 +11,13 @@
   and net update use primary)
 -   [ ] take out utils in data base and libs(json) ; 
  
+ 
+GlobalSecondaryIndexes:
+        - IndexName: gsiCaseCountTable
+          KeySchema:
+            - AttributeName: table-name
+              KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+              - count
+            ProjectionType: INCLUDE
