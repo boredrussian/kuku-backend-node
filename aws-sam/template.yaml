@@ -6,21 +6,6 @@ Parameters:
     Type: String
     Default: prod
 Resources:
-  IndexTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: signed-index
-      AttributeDefinitions:
-        - AttributeName: address
-          AttributeType: S
-        - AttributeName: version
-          AttributeType: N
-      KeySchema:
-        - AttributeName: address
-          KeyType: HASH
-        - AttributeName: version
-          KeyType: RANGE
-      BillingMode: "PAY_PER_REQUEST"
   PublicAPIRole:
     Type: AWS::IAM::Role
     Properties:
@@ -41,7 +26,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - "dynamodb:Query"
-                Resource: !GetAtt IndexTable.Arn
+                Resource: "arn:aws:dynamodb:us-west-2:164620743841:table/signed-index"
   Api:
     Type: AWS::Serverless::Api
     Properties:
@@ -56,16 +41,6 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: index-openapi.yaml
-  LambdaLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: signed-lambda-layer
-      Description: Dependencies for signed.移动
-      ContentUri: lambda-layer/
-      CompatibleRuntimes:
-        - nodejs14.x
-      LicenseInfo: "MIT"
-      RetentionPolicy: Retain
 Outputs:
   IndexUrl:
     Description: Public Index URL

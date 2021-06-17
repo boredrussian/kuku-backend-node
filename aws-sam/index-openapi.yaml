@@ -39,7 +39,7 @@ paths:
                       }
                   }
                 }
-              - { tableName: { Ref: IndexTable } }
+              - { tableName: "signed-index" }
         responses:
           default:
             statusCode: "200"
