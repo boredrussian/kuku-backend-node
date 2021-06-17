@@ -10,7 +10,7 @@ module.exports.register = async ({ event }) => {
     let body, response, address, encryptedWif, login, salt, verifier;
     try {
         body = parseJson(event.body);
-        ({ address, encryptedWif, login, salt, verifier, privateKey } = body);
+        ({ address, encryptedWif, login, salt, verifier } = body);
     } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }

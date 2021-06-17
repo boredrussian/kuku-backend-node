@@ -48,6 +48,21 @@ Resources:
           Properties:
             Method: post
             Path: /register/checkLogin
+        ExchangeEphemeralKeysFirstStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/exchangeEphemeralKeys
+        ValidateSessionProofsSecondStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/validateSessionProofs
+        GetUserTokenThirdLoginStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/getUserToken
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion

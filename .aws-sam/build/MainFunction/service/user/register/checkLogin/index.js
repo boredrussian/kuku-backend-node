@@ -1,7 +1,7 @@
 const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
-const { getUserByLogin } = require('../../../dataBase/user/get');
-const { config } = require("../../../config");
+const { getUserByLogin } = require('../../../../dataBase/user/get');
+const { config } = require("../../../../config");
 
 module.exports.checkLogin = async ({ event }) => {
     let body, response, login, isFreeLogin;
@@ -11,7 +11,6 @@ module.exports.checkLogin = async ({ event }) => {
     } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }
-
 
     try {
         const user = await getUserByLogin({ tableName: config.userTableName, login: login });

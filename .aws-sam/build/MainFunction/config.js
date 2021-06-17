@@ -6,7 +6,7 @@ exports.config = {
     userTableName: "users",
     jwtSecret: "JWT_SECRET_ACCESS"
 };
-exports.configApi = {
+exports.httpApi = {
     savePost: {
         method: 'post',
         path: '/post'
@@ -19,8 +19,20 @@ exports.configApi = {
         method: 'post',
         path: '/register'
     },
-    checkLogin: {
+    registerCheckLogin: {
         method: 'post',
-        path: 'register/checkLogin'
+        path: '/register/checkLogin'
+    },
+    exchangeEphemeralKeysFirstStepLogin: {
+        method: 'post',
+        path: '/login/exchangeEphemeralKeys'
+    },
+    validateSessionProofsSecondStepLogin: {
+        method: 'post',
+        path: '/login/validateSessionProofs'
+    },
+    GetUserTokenThirdLoginStepLogin: {
+        method: 'post',
+        path: '/login/getUserToken'
     },
 };

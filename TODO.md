@@ -19,5 +19,9 @@ GlobalSecondaryIndexes:
               KeyType: HASH
           Projection:
             NonKeyAttributes:
-              - count
             ProjectionType: INCLUDE
+              - count
+
+!!!
+-   [ ] set jwt in headers Barrier; 
+-   [ ] set jwt in headers Barrier; 
