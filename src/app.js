@@ -31,9 +31,9 @@ exports.lambdaHandler = async (event, context) => {
         case httpApi.registerCheckLogin.path:
             response = await checkLogin({ event });
             break;
-        case httpApi.exchangeEphemeralKeysFirstStepLogin.path:
-            response = await getEphemeralKeys({ event });
-            break;
+        // case httpApi.exchangeEphemeralKeysFirstStepLogin.path:
+        //     response = await getEphemeralKeys({ event });
+        //     break;
         /*     case httpApi.validateSessionProofsSecondStepLogin.path:
                 response = await getSessionProofs({ event });
                 break;

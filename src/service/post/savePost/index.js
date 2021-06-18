@@ -2,12 +2,19 @@ const { putFile } = require('./utilities/putFile');
 const { updateIndex } = require('./utilities/updateIndex');
 const { checkIsPostValid } = require('./utilities/isPostValid');
 const parseJson = require("parse-json");
-
+const CryptoJS = require('crypto-js');
 exports.savePost = async ({ event }) => {
-    let response, post, addToIndex, isValid = true;
-    
+    let response, post, addToIndex, isValid = true, encoded;
+
     try {
-        const body = parseJson(event.body);
+        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+    } catch (e) {
+        console.warn('[savePost][parseJson]', e);
+    }
+
+    try {
+        const body = parseJson(encoded);
         ({ post, addToIndex } = body);
     } catch (e) {
         console.warn('[savePost][parseJson]', e)

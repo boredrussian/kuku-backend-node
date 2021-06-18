@@ -1,7 +1,4 @@
-export const sessionProof = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
+module.exports.getSessionProofs = async (
 ) => {
     // TODO: validation
     //   STORE uniq user login on dynamodb if possible

@@ -4,9 +4,10 @@ const { updateEphemeralSecret } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/client')
 const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
+const { config } = require('../../../../config')
 
 module.exports.getEphemeralKeys = async ({ event }) => {
-    let body, response, login, serverEphemeralSecret, user, loginDataSecondStep;
+    let body, login, serverEphemeralSecret, user, loginDataSecondStep;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
@@ -22,7 +23,7 @@ module.exports.getEphemeralKeys = async ({ event }) => {
     }
 
     try {
-        user = await getUserByLogin({ login: login });
+        user = await getUserByLogin({ tableName: config.userTableName, login: login });
         if (!user) {
             return response;
         }
