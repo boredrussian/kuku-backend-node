@@ -3,16 +3,28 @@ const parseJson = require("parse-json");
 const { config } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
 const { addUser } = require("../../../dataBase/user/put");
-
+const CryptoJS = require('crypto-js');
 
 module.exports.register = async ({ event }) => {
 
-    let body, response, address, encryptedWif, login, salt, verifier;
+    let body, response, address, encryptedWif, login, salt, verifier, encoded;
+
     try {
-        body = parseJson(event.body);
+        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+    }
+    catch (e) {
+        console.warn('[register][Base64.parse]', e);
+    }
+
+
+    try {
+
+        body = parseJson(encoded);
+
         ({ address, encryptedWif, login, salt, verifier } = body);
     } catch (e) {
-        console.warn('[savePost][parseJson]', e);
+        console.warn('[register][parseJson]', e);
     }
 
     const accessToken = makeToken({ type: "access" });

@@ -6,7 +6,7 @@ const { getEphemeralKeys } = require('./service/user/login/getEphemeralKeys');
 const { getSessionProofs } = require('./service/user/login/getSessionProofs');
 const { getUserByTokenLogin } = require('./service/user/login/getUserByTokenLogin');
 const { httpApi } = require('./config');
-const { getUserByLogin } = require('./dataBase/user/get');
+// const { getUserByLogin } = require('./dataBase/user/get');
 
 
 exports.lambdaHandler = async (event, context) => {
@@ -31,18 +31,23 @@ exports.lambdaHandler = async (event, context) => {
         case httpApi.registerCheckLogin.path:
             response = await checkLogin({ event });
             break;
-        // case httpApi.exchangeEphemeralKeysFirstStepLogin.path:
-        //     response = await getEphemeralKeys({ event });
-        //     break;
-        /*     case httpApi.validateSessionProofsSecondStepLogin.path:
-                response = await getSessionProofs({ event });
-                break;
-            case httpApi.GetUserTokenThirdLoginStepLogin.path:
-                response = await getUserByTokenLogin({ event });
-                break; */
+        case httpApi.exchangeEphemeralKeysFirstStepLogin.path:
+            response = await getEphemeralKeys({ event });
+            break;
+        case httpApi.validateSessionProofsSecondStepLogin.path:
+            response = await getSessionProofs({ event });
+            break;
+        /*   case httpApi.GetUserTokenThirdLoginStepLogin.path:
+              response = await getUserByTokenLogin({ event });
+              break; */
+        /*    case httpApi.GetUser.path:
+               response = await GetUser({ event });
+               break; */
         default:
             response = notFoundResponse;
     }
+
+
 
     if (!response) {
         response = notFoundResponse;

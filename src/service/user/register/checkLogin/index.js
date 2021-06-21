@@ -2,14 +2,29 @@ const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { config } = require("../../../../config");
+const CryptoJS = require('crypto-js');
 
 module.exports.checkLogin = async ({ event }) => {
-    let body, response, login, isFreeLogin;
+
+    let body, response, login, isFreeLogin, encoded;
+
+
     try {
-        body = parseJson(event.body);
+        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+    }
+    catch (e) {
+        console.warn('[register][Base64.parse]', e);
+    }
+
+
+
+    try {
+        body = parseJson(encoded);
         ({ login } = body);
+        console.log('login', login);
     } catch (e) {
-        console.warn('[savePost][parseJson]', e);
+        console.warn('[checkLogin][parseJson]', e);
     }
 
     try {

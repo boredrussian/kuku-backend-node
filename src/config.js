@@ -35,4 +35,8 @@ exports.httpApi = {
         method: 'post',
         path: '/login/getUserToken'
     },
+    GetUser: {
+        method: 'post',
+        path: '/user'
+    },
 };

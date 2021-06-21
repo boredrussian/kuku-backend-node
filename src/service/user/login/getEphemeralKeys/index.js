@@ -1,29 +1,43 @@
 
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { updateEphemeralSecret } = require('../../../../dataBase/user/update');
-const srp = require('secure-remote-password/client')
+const srp = require('secure-remote-password/server')
 const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
-const { config } = require('../../../../config')
+const { config } = require('../../../../config');
+const CryptoJS = require('crypto-js');
+
+
 
 module.exports.getEphemeralKeys = async ({ event }) => {
-    let body, login, serverEphemeralSecret, user, loginDataSecondStep;
+        let body, userName, serverEphemeralSecret, user, loginDataSecondStep, encoded;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
     };
-    try {
-        body = parseJson(event.body);
-        ({ login } = body);
+    
+     try {
+        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
     } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }
-    if (!login) {
+    
+    
+    
+    try {
+        body = parseJson(encoded);
+        ({ userName } = body);
+       
+        } catch (e) {
+        console.warn('[savePost][parseJson]', e);
+    }
+    if (!userName) {
         return response;
     }
 
     try {
-        user = await getUserByLogin({ tableName: config.userTableName, login: login });
+        user = await getUserByLogin({ tableName: config.userTableName, login: userName });
         if (!user) {
             return response;
         }
@@ -33,6 +47,8 @@ module.exports.getEphemeralKeys = async ({ event }) => {
     }
 
     try {
+        
+        
         const serverEphemeral = srp.generateEphemeral(user?.verifier);
         serverEphemeralSecret = serverEphemeral.secret;
         loginDataSecondStep = {
@@ -40,14 +56,17 @@ module.exports.getEphemeralKeys = async ({ event }) => {
             salt: user.salt,
         };
 
-        console.log('response--fffff', response);
-    } catch (e) {
+         } catch (e) {
         console.warn("[login--2]", e);
         return response;
     }
 
     try {
+        
+        
+        console.log('serverEphemeralSecret!!!!!', serverEphemeralSecret)
         await updateEphemeralSecret({
+            tableName: config.userTableName,
             address: user?.address,
             serverEphemeralSecret: serverEphemeralSecret,
         });
@@ -55,6 +74,7 @@ module.exports.getEphemeralKeys = async ({ event }) => {
         if (!loginDataSecondStep) {
             return response;
         }
+  
         response = {
             ...response,
             statusCode: 200,
