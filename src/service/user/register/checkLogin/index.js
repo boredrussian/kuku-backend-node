@@ -4,21 +4,21 @@ const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { config } = require("../../../../config");
 const CryptoJS = require('crypto-js');
 
+
 module.exports.checkLogin = async ({ event }) => {
-
+    
     let body, response, login, isFreeLogin, encoded;
-
-
-    try {
-        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
-        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+    
+  
+      try{
+     const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+     encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
     }
-    catch (e) {
-        console.warn('[register][Base64.parse]', e);
+    catch(e){
+          console.warn('[register][Base64.parse]', e);
     }
-
-
-
+    
+    
     try {
         body = parseJson(encoded);
         ({ login } = body);

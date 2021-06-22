@@ -31,7 +31,7 @@ exports.httpApi = {
         method: 'post',
         path: '/login/validateSessionProofs'
     },
-    GetUserTokenThirdLoginStepLogin: {
+    GetUserThirdStepLogin: {
         method: 'post',
         path: '/login/getUserToken'
     },

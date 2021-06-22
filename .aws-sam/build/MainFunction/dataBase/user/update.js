@@ -23,8 +23,8 @@ module.exports.updateEphemeralSecret = async ({
         },
         ReturnValues: "ALL_NEW",
     };
-
-    const result = await dynamoDb.update(params).promise();
+    
+     const result = await dynamoDb.update(params).promise();
     return result;
 };
 

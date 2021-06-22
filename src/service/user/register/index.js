@@ -7,22 +7,22 @@ const CryptoJS = require('crypto-js');
 
 module.exports.register = async ({ event }) => {
 
-    let body, response, address, encryptedWif, login, salt, verifier, encoded;
-
-    try {
-        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
-        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+    let body, response, address, encryptedWif, userName, salt, verifier, encoded;
+    
+    try{
+     const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+     encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
     }
-    catch (e) {
-        console.warn('[register][Base64.parse]', e);
+    catch(e){
+          console.warn('[register][Base64.parse]', e);
     }
-
-
+    
+    
     try {
-
+        
         body = parseJson(encoded);
-
-        ({ address, encryptedWif, login, salt, verifier } = body);
+        
+        ({ address, encryptedWif, userName, salt, verifier } = body);
     } catch (e) {
         console.warn('[register][parseJson]', e);
     }
@@ -31,19 +31,19 @@ module.exports.register = async ({ event }) => {
     try {
         const data = await addUser({
             tableName: config.userTableName,
-            address: address,
-            encryptedWif: encryptedWif,
-            salt: salt,
-            verifier: verifier,
-            login: login,
+            address,
+            encryptedWif,
+            salt,
+            verifier,
+            login: userName,
             accessToken,
         });
 
         const resData = {
             accessToken,
-            address: address,
-            login: login,
-            encryptedWif: encryptedWif,
+            address,
+            userName,
+            encryptedWif,
         };
 
         response = {

@@ -10,6 +10,7 @@
 -   [ ]  need to realize is possible update dynamoDb without two queries in db(first query, get primery key,
   and net update use primary)
 -   [ ] take out utils in data base and libs(json) ; 
+-   [ ] take out to utils processing decode from body base64 string ; 
  
  
 GlobalSecondaryIndexes:

@@ -61,6 +61,11 @@ Resources:
           Properties:
             Method: post
             Path: /login/getUserToken
+        GetUser:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user
   DepLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:

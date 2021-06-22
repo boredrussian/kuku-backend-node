@@ -8,28 +8,25 @@ const { config } = require('../../../../config');
 const CryptoJS = require('crypto-js');
 
 
-
 module.exports.getEphemeralKeys = async ({ event }) => {
-        let body, userName, serverEphemeralSecret, user, loginDataSecondStep, encoded;
+    let body, userName, serverEphemeralSecret, user, loginDataSecondStep, encoded;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
     };
-    
-     try {
+
+    try {
         const encodedWord = CryptoJS.enc.Base64.parse(event.body);
         encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
     } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }
-    
-    
-    
+
     try {
         body = parseJson(encoded);
         ({ userName } = body);
-       
-        } catch (e) {
+
+    } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }
     if (!userName) {
@@ -47,8 +44,8 @@ module.exports.getEphemeralKeys = async ({ event }) => {
     }
 
     try {
-        
-        
+
+
         const serverEphemeral = srp.generateEphemeral(user?.verifier);
         serverEphemeralSecret = serverEphemeral.secret;
         loginDataSecondStep = {
@@ -56,15 +53,12 @@ module.exports.getEphemeralKeys = async ({ event }) => {
             salt: user.salt,
         };
 
-         } catch (e) {
+    } catch (e) {
         console.warn("[login--2]", e);
         return response;
     }
 
     try {
-        
-        
-        console.log('serverEphemeralSecret!!!!!', serverEphemeralSecret)
         await updateEphemeralSecret({
             tableName: config.userTableName,
             address: user?.address,
@@ -74,9 +68,8 @@ module.exports.getEphemeralKeys = async ({ event }) => {
         if (!loginDataSecondStep) {
             return response;
         }
-  
+
         response = {
-            ...response,
             statusCode: 200,
             body: stringify(loginDataSecondStep)
         }

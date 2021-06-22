@@ -1,41 +1,79 @@
-export const sessionProof = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    // TODO: validation
-    //   STORE uniq user login on dynamodb if possible
-    let user;
+
+const { getUserByLogin } = require('../../../../dataBase/user/get');
+const { updateServerSessionProof } = require('../../../../dataBase/user/update');
+const srp = require('secure-remote-password/server');
+const parseJson = require("parse-json");
+const stringify = require('fast-json-stable-stringify');
+const { config } = require('../../../../config');
+const CryptoJS = require('crypto-js');
+
+
+module.exports.getSessionProofs = async ({ event }) => {
+    let encoded, userName, clientSessionProof, clientEphemeralPublic, body, user;
+    let response = {
+        'statusCode': 404,
+        'body': 'Login or password is invalid'
+    };
+
+
     try {
-        user = await getUserByLogin({ login: req.body.login });
+        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+
     } catch (e) {
-        return next(createError(403, "[sessionProof][error user not found]"));
+        console.warn('[sessionProof][parseJson]', e);
     }
-    const clientSessionProof = req.body.clientSessionProof;
-    const clientEphemeralPublic = req.body.clientEphemeralPublic;
-    const login = req.body.login;
-    const serverEphemeralSecret = user?.serverEphemeralSecret;
-    const salt = user?.salt;
-    const verifier = user?.verifier;
+
+
+    try {
+        body = parseJson(encoded);
+        ({ userName, clientSessionProof, clientEphemeralPublic, userName } = body);
+
+    } catch (e) {
+        console.warn('[getSessionProofs][parseJson]', e);
+    }
+
+
+    try {
+        user = await getUserByLogin({ tableName: config.userTableName, login: userName });
+
+
+        console.log('user', user)
+    } catch (e) {
+        console.warn('[sessionProof][getUserByLogin]', e);
+    }
+
 
     if (user) {
         try {
+            const { serverEphemeralSecret, salt, verifier } = user;
+
             const serverSession = srp.deriveSession(
                 serverEphemeralSecret,
                 clientEphemeralPublic,
                 salt,
-                login,
+                userName,
                 verifier,
                 clientSessionProof
             );
-            await updateUser_ServerSessionProof({
+
+            await updateServerSessionProof({
+                tableName: config.userTableName,
                 address: user.address,
                 serverSessionProof: serverSession.proof,
             });
-            res.send({ serverSessionProof: serverSession.proof });
+
+            response = {
+                statusCode: 200,
+                body: stringify({ serverSessionProof: serverSession.proof })
+            }
+
+
         } catch (e) {
             console.warn("[sessionProof]", e);
-            res.send({ errorMessage: "Login or password is invalid" });
+            return response;
         }
     }
+
+    return response;
 };
