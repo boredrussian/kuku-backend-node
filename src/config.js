@@ -1,11 +1,14 @@
 exports.config = {
     bucket: 'kuku-staging',
     savePostFile: 'public/file_storage',
+    configFile: 'public/config.json',
     region: "us-west-2",
     indexTableName: "signed-index",
     userTableName: "users",
-    jwtSecret: "JWT_SECRET_ACCESS"
+    jwtSecret: "JWT_SECRET_ACCESS",
+    publicApiHost: "https://v6i481ta1m.execute-api.us-west-2.amazonaws.com/prod"
 };
+
 exports.httpApi = {
     savePost: {
         method: 'post',
@@ -31,12 +34,20 @@ exports.httpApi = {
         method: 'post',
         path: '/login/validateSessionProofs'
     },
-    GetUserThirdStepLogin: {
+    getUserThirdStepLogin: {
         method: 'post',
         path: '/login/getUserToken'
     },
-    GetUser: {
+    getUser: {
         method: 'post',
         path: '/user'
+    },
+    getSubscribed: {
+        method: 'get',
+        path: '/subscribed'
+    },
+    fileUpload: {
+        method: 'post',
+        path: '/file/upload'
     },
 };

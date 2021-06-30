@@ -68,6 +68,16 @@ Resources:
           Properties:
             Method: post
             Path: /user
+        GetHosts:
+          Type: HttpApi
+          Properties:
+            Method: get
+            Path: /hosts
+        UploadFile:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /file/upload
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion

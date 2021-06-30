@@ -2,14 +2,13 @@
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { updateServerSessionProof } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/server');
-const parseJson = require("parse-json");
+// const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
 const { config } = require('../../../../config');
-const CryptoJS = require('crypto-js');
-
+const { bodyEncrypted } = require('../../../../lib/crypto');
 
 module.exports.getSessionProofs = async ({ event }) => {
-    let encoded, userName, clientSessionProof, clientEphemeralPublic, body, user;
+    let userName, clientSessionProof, clientEphemeralPublic, user;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
@@ -17,31 +16,16 @@ module.exports.getSessionProofs = async ({ event }) => {
 
 
     try {
-        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
-        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+        ({ userName, clientSessionProof, clientEphemeralPublic } = bodyEncrypted({ event }));
     } catch (e) {
-        console.warn('[sessionProof][parseJson]', e);
+        console.warn('[getSessionProofs][bodyEncrypted]', e);
     }
-
-
-    try {
-        body = parseJson(encoded);
-        ({ userName, clientSessionProof, clientEphemeralPublic } = body);
-
-    } catch (e) {
-        console.warn('[getSessionProofs][parseJson]', e);
-    }
-
 
     try {
         user = await getUserByLogin({ tableName: config.userTableName, login: userName });
-
-
-        console.log('user', user)
     } catch (e) {
         console.warn('[sessionProof][getUserByLogin]', e);
     }
-
 
     if (user) {
         try {
@@ -66,7 +50,6 @@ module.exports.getSessionProofs = async ({ event }) => {
                 statusCode: 200,
                 body: stringify({ serverSessionProof: serverSession.proof })
             }
-
 
         } catch (e) {
             console.warn("[sessionProof]", e);

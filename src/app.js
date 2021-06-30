@@ -3,10 +3,12 @@ const { getIndexService } = require('./service/post/getIndex');
 const { register } = require('./service/user/register');
 const { checkLogin } = require('./service/user/register/checkLogin');
 const { getEphemeralKeys } = require('./service/user/login/getEphemeralKeys');
- const { getSessionProofs } = require('./service/user/login/getSessionProofs');
-// const { getUserByTokenLogin } = require('./service/user/login/getUserByTokenLogin');
-const { httpApi } = require('./config');
+const { getSessionProofs } = require('./service/user/login/getSessionProofs');
+const { getUserLogin } = require('./service/user/login/getUserLogin');
+const { getUser } = require('./service/user/getUser');
+const { getSubscribed } = require('./service/user/getSubscribed');
 
+const { httpApi } = require('./config');
 
 
 exports.lambdaHandler = async (event, context) => {
@@ -16,7 +18,7 @@ exports.lambdaHandler = async (event, context) => {
         'statusCode': 404,
     };
 
-    console.log('path', path);
+    console.log('path---', path);
 
     switch (path) {
         case httpApi.savePost.path:
@@ -34,12 +36,18 @@ exports.lambdaHandler = async (event, context) => {
         case httpApi.exchangeEphemeralKeysFirstStepLogin.path:
             response = await getEphemeralKeys({ event });
             break;
-         case httpApi.validateSessionProofsSecondStepLogin.path:
-             response = await getSessionProofs({ event });
-             break;
-        //   case httpApi.GetUserTokenThirdLoginStepLogin.path:
-        //         response = await getUserByTokenLogin({ event });
-        //         break;  
+        case httpApi.validateSessionProofsSecondStepLogin.path:
+            response = await getSessionProofs({ event });
+            break;
+        case httpApi.getUserThirdStepLogin.path:
+            response = await getUserLogin({ event });
+            break;
+        case httpApi.getUser.path:
+            response = await getUser({ event });
+            break;
+        case httpApi.getSubscribed.path:
+            response = await getSubscribed({ event });
+            break;
         default:
             response = notFoundResponse;
     }

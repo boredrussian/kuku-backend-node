@@ -2,7 +2,7 @@ const bitcoinMessage = require("bitcoinjs-message");
 const sortKeys = require("sort-keys");
 const stringify = require("fast-json-stable-stringify");
 const parseJson = require("parse-json");
-const { isPostValid } = require("../../../../lib/bitcoin");
+const { isPostValid } = require("../../../../lib/crypto");
 
 
 const getPostJsonFromObj = ({ post }) => {

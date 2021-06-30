@@ -2,30 +2,20 @@
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { updateEphemeralSecret } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/server')
-const parseJson = require("parse-json");
+
 const stringify = require('fast-json-stable-stringify');
 const { config } = require('../../../../config');
-const CryptoJS = require('crypto-js');
-
+const { bodyEncrypted } = require('../../../../lib/crypto');
 
 module.exports.getEphemeralKeys = async ({ event }) => {
-    let body, userName, serverEphemeralSecret, user, loginDataSecondStep, encoded;
+    let userName, serverEphemeralSecret, user, loginDataSecondStep;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
     };
 
     try {
-        const encodedWord = CryptoJS.enc.Base64.parse(event.body);
-        encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
-    } catch (e) {
-        console.warn('[savePost][parseJson]', e);
-    }
-
-    try {
-        body = parseJson(encoded);
-        ({ userName } = body);
-
+        ({ userName } = bodyEncrypted({ event }));
     } catch (e) {
         console.warn('[savePost][parseJson]', e);
     }
@@ -44,8 +34,6 @@ module.exports.getEphemeralKeys = async ({ event }) => {
     }
 
     try {
-
-
         const serverEphemeral = srp.generateEphemeral(user?.verifier);
         serverEphemeralSecret = serverEphemeral.secret;
         loginDataSecondStep = {

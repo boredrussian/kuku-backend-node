@@ -1,34 +1,18 @@
-const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { config } = require("../../../../config");
-const CryptoJS = require('crypto-js');
-
+const { bodyEncrypted } = require('../../../../lib/crypto');
 
 module.exports.checkLogin = async ({ event }) => {
-    
-    let body, response, login, isFreeLogin, encoded;
-    
-  
-      try{
-     const encodedWord = CryptoJS.enc.Base64.parse(event.body);
-     encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
-    }
-    catch(e){
-          console.warn('[register][Base64.parse]', e);
-    }
-    
-    
+    let response, userName, isFreeLogin;
     try {
-        body = parseJson(encoded);
-        ({ login } = body);
-        console.log('login', login);
+        ({ userName } = bodyEncrypted({ event }));
     } catch (e) {
-        console.warn('[checkLogin][parseJson]', e);
+        console.warn('[checkLogin][bodyEncrypted]', e);
     }
 
     try {
-        const user = await getUserByLogin({ tableName: config.userTableName, login: login });
+        const user = await getUserByLogin({ tableName: config.userTableName, login: userName });
         if (user) {
             isFreeLogin = false;
         }

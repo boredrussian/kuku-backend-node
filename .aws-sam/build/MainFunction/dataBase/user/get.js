@@ -27,8 +27,50 @@ module.exports.getUserByLogin = async ({ tableName, login }) => {
         console.warn('[getUserByLogin][query]', e);
     }
 
-    if (userResData.Items && userResData.Items.length > 0) {
+    if (userResData?.Items && userResData.Items.length > 0) {
         userResult = userResData.Items[0];
     }
     return userResult;
+};
+
+
+
+
+module.exports.getUserByAccessToken = async ({ tableName, token }) => {
+    let result;
+    const params = {
+        TableName: tableName,
+        IndexName: "accessToken_index",
+        KeyConditionExpression: "#accessToken = :accessToken",
+        ExpressionAttributeNames: {
+            "#accessToken": "accessToken",
+        },
+        ExpressionAttributeValues: {
+            ":accessToken": token,
+        },
+    };
+
+    let queryResult = await dynamoDb.query(params).promise();
+
+    if (queryResult?.Items && queryResult?.Items?.length > 0) {
+        result = queryResult?.Items[0];
+    }
+    return result;
+};
+
+
+module.exports.getSources = async ({ tableName }) => {
+    let result;
+
+    const params = {
+        TableName: tableName,
+        Select: "ALL_ATTRIBUTES"
+    };
+
+    let queryResult = await dynamoDb.scan(params).promise();
+
+    if (queryResult?.Items && queryResult?.Items?.length > 0) {
+        result = queryResult?.Items;
+    }
+    return result;
 };
