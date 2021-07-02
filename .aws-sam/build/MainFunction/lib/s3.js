@@ -50,7 +50,7 @@ const getObject = async ({ bucket, key }) => {
 }
 
 
-const isObjectExist = ({ bucket, key }) => {
+const isObjectExist = async ({ bucket, key }) => {
     var params = {
         Bucket: bucket,
         Key: key
@@ -65,7 +65,6 @@ const isObjectExist = ({ bucket, key }) => {
         }
     }
 }
-
 
 module.exports = {
     putObjectS3,

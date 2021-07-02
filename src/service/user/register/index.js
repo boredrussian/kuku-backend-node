@@ -3,11 +3,11 @@ const { makeToken } = require("../../../lib/jwt");
 const { config } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
 const { addUser } = require("../../../dataBase/user/put");
-const { updateUserConfig } = require("../_utils/subscribed");
+const { addNewUserToConfig } = require("../_utils/subscribed");
 const { bodyEncrypted } = require('../../../lib/crypto');
 
 const register = async ({ event }) => {
-    address, encryptedWif, userName, salt, verifier, subscribed;
+    let address, encryptedWif, userName, salt, verifier, subscribed;
     let response = {
         'statusCode': 403,
         'body': `Error was occurred [addUser]`
@@ -20,7 +20,8 @@ const register = async ({ event }) => {
     }
     const accessToken = makeToken({ type: "access" });
     try {
-        subscribed = await updateUserConfig({ address });
+        subscribed = await addNewUserToConfig({ address });
+        console.log('subscribed---register', subscribed)
     } catch (e) {
         console.warn("[register][updateUserConfig]", e);
     }

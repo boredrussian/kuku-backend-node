@@ -32,7 +32,7 @@ module.exports.getUserLogin = async ({ event }) => {
   }
 
   try {
-    subscribed = await getSubscribed();
+    subscribed = await getSubscribed({ userAddress: user?.address });
   } catch (e) {
     console.warn("[getUser][getSubscribed]", e);
   }

@@ -66,11 +66,11 @@ Resources:
           Properties:
             Method: post
             Path: /user
-        GetHosts:
+        GetSubscribed:
           Type: HttpApi
           Properties:
             Method: get
-            Path: /hosts
+            Path: /subscribed
         UploadFile:
           Type: HttpApi
           Properties:

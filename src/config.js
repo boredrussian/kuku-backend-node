@@ -1,6 +1,7 @@
 exports.config = {
     bucket: 'kuku-staging',
     savePostFile: 'public/file_storage',
+    saveImgFile: 'public/static/img',
     configFile: 'public/config.json',
     region: "us-west-2",
     indexTableName: "signed-index",

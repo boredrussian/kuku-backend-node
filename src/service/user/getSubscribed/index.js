@@ -12,7 +12,7 @@ module.exports.getSubscribed = async ({ event }) => {
     };
 
     try {
-        subscribed = await getSubscribed();
+        subscribed = await getSubscribed({});
     } catch (e) {
         console.warn("[getSubscribed][getSubscribed]", e);
     }
