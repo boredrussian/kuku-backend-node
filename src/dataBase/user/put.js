@@ -16,6 +16,8 @@ module.exports.addUser = async ({
     verifier,
     login,
     accessToken,
+    subscribed,
+    hosts
 }) => {
     const params = {
         TableName: tableName,
@@ -26,6 +28,8 @@ module.exports.addUser = async ({
             verifier,
             login,
             accessToken,
+            subscribed,
+            hosts
         },
     };
     return await dynamoDb.put(params).promise();

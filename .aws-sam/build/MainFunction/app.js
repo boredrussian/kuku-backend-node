@@ -1,5 +1,6 @@
 const { savePost } = require('./service/post/savePost');
 const { getIndexService } = require('./service/post/getIndex');
+const { fileUpload } = require('./service/post/fileUpload');
 const { register } = require('./service/user/register');
 const { checkLogin } = require('./service/user/register/checkLogin');
 const { getEphemeralKeys } = require('./service/user/login/getEphemeralKeys');
@@ -7,6 +8,9 @@ const { getSessionProofs } = require('./service/user/login/getSessionProofs');
 const { getUserLogin } = require('./service/user/login/getUserLogin');
 const { getUser } = require('./service/user/getUser');
 const { getSubscribed } = require('./service/user/getSubscribed');
+
+
+
 
 const { httpApi } = require('./config');
 
@@ -47,6 +51,9 @@ exports.lambdaHandler = async (event, context) => {
             break;
         case httpApi.getSubscribed.path:
             response = await getSubscribed({ event });
+            break;
+        case httpApi.fileUpload.path:
+            response = await fileUpload({ event });
             break;
         default:
             response = notFoundResponse;

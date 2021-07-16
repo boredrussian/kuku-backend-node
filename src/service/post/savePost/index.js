@@ -22,16 +22,17 @@ exports.savePost = async ({ event }) => {
         console.warn('[savePost][parseJson]', e)
     }
 
-    /*   try {
-          isValid = checkIsPostValid({ post });
-          console.log('isValid', isValid)
+    try {
+          isValid =  checkIsPostValid({ post });
+          console.log('isValid!!!!!!!', isValid)
       } catch (e) {
           isValid = false;
           // TODO add error response
           return;
-      } */
+      }  
 
     if (isValid) {
+          console.log('1111111111isValid!!!!!!!', isValid)
         await putFile({ post });
         if (addToIndex) {
             await updateIndex({ post });

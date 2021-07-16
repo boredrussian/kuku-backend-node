@@ -2,14 +2,14 @@ const stringify = require('fast-json-stable-stringify');
 // const { config } = require("/opt/nodejs/config");
 const { config } = require("../../../../config");
 const { putObjectS3 } = require("../../../../lib/s3");
-
+const { getFoldersName } = require("../../_utils");
  
-const getFoldersName = (hash) => {
-    return {
-        first: hash.slice(0, 2),
-        second: hash.slice(2, 4),
-    };
-};
+// const getFoldersName = (hash) => {
+//     return {
+//         first: hash.slice(0, 2),
+//         second: hash.slice(2, 4),
+//     };
+// };
 
 exports.putFile = async ({ post }) => {
     let res, postString;
@@ -19,8 +19,8 @@ exports.putFile = async ({ post }) => {
     }
     const hash = post.hash;
     const folders = getFoldersName(hash);
-    const saveToPath = `${config.savePostFile}/${folders.first}/${folders.second}/${hash}.json`;
-
+    const saveToPath = `${config.savePostFile}/${folders.first}/${folders.second}/${folders.fileName}.json`;
+  
     try {
         postString = stringify(post);
     } catch (e) {

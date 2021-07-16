@@ -14,7 +14,6 @@ const isPostValid = ({ message, address, signatures }) => {
     return isValid;
 }
 
-
 const bodyEncrypted = ({ event }) => {
     let body;
     if (!event) {

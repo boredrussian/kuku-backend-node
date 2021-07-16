@@ -71,3 +71,25 @@ module.exports.updateAccessToken = async ({
     const result = await dynamoDb.update(params).promise();
     return result;
 };
+
+
+module.exports.updateUsersSubscribed = async ({
+    tableName,
+    address,
+    accessToken,
+}) => {
+    const params = {
+        TableName: tableName,
+        Key: {
+            address: address,
+        },
+        UpdateExpression: "set accessToken = :accessToken",
+        ExpressionAttributeValues: {
+            ":accessToken": accessToken,
+        },
+        ReturnValues: "ALL_NEW",
+    };
+
+    const result = await dynamoDb.update(params).promise();
+    return result;
+};

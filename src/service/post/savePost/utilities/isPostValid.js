@@ -16,13 +16,13 @@ const getPostJsonFromObj = ({ post }) => {
 };
 
 
-exports.checkIsPostValid = async ({ post }) => {
+exports.checkIsPostValid =  ({ post }) => {
     const { address } = post.source;
     const { signatures } = post;
     const message = getPostJsonFromObj({ post: post });
     let isValid;
     try {
-        isValid = await isPostValid({
+        isValid =  isPostValid({
             message, address, signatures
         })
     } catch (e) {

@@ -1,3 +1,4 @@
+
 const stringify = require('fast-json-stable-stringify');
 const { getUserByAccessToken } = require('../../../dataBase/user/get');
 const { config } = require('../../../config');
@@ -19,20 +20,22 @@ module.exports.getUser = async ({ event }) => {
         console.warn('[getUser][bodyEncrypted]', e);
     }
 
-    try {
-        subscribed = await getSubscribed();
-    } catch (e) {
-        console.warn("[getUser][getSubscribed]", e);
-    }
-
 
     try {
         user = await getUserByAccessToken({ tableName: config.userTableName, token });
+         try {
+        // subscribed = await getSubscribed({userAddress: user?.address});
+                console.log('subscribed-1---------111-111-111' , subscribed)
+        
+            } catch (e) {
+        console.warn("[getUser][getSubscribed]", e);
+    }
         if (user) {
             const data = {
                 address: user?.address,
                 userName: user?.login,
-                subscribed: subscribed,
+                subscribed: user?.subscribed,
+                hosts: user?.hosts,
             };
 
             response = {

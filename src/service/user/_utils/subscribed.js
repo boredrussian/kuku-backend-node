@@ -14,6 +14,23 @@ const getAddresses = ({ users }) => {
     return addresses;
 };
 
+const generateSubscribed = ({addresses}) => {
+    
+    if(!Array.isArray(addresses)){
+        return [];
+    }
+    
+   const subscribed = addresses.map(adr => {
+        return {
+            address: adr,
+            url: `${config.publicApiHost}/${adr}`
+        };
+    })
+    
+    return subscribed;
+}
+
+
 const getSubscribed = async ({ userAddress = '' }) => {
     let usersData, subscribedList;
 
@@ -49,62 +66,52 @@ const getSubscribed = async ({ userAddress = '' }) => {
 
 const updateUserConfig = async ({ currentUserData }) => {
     let usersData = [], subscribedList;
-
     try {
         const usersConfigJson = await getObject({
             bucket: config.bucket,
             key: config.configFile,
         });
         usersData = parseJson(usersConfigJson);
-        console.log('userData-----userData', usersData);
-    } catch (e) {
+       } catch (e) {
         console.warn("[updateUserConfig]", e);
     }
 
-
     if (!Array.isArray(usersData) || usersData === []) {
-        const currentUserData = {
-            address: currentUserData.address,
-            subscribed: []
-        }
-        usersData = [currentUserData]
-    } else if (Array.isArray(usersData)) {
-        usersData.map(data => data.subscribed.push({ url: `${config.publicApiHost}/${currentUserData.address}` }));
-    }
-    usersData.push(currentUserData)
+        usersData = [currentUserData];
+        
+    }   usersData.push(currentUserData)
+    
     return usersData;
 }
 
 
 const addNewUserToConfig = async ({ address }) => {
-    let subscribed, currentUserData, newConfig;
-    try {
-        subscribed = await getSubscribed({});
-        currentUserData = {
+    let subscribed;
+    // try {
+    //     subscribed = await getSubscribed({});
+       
+    // } catch (e) {
+    //     console.warn("[_utils][subscribed][addNewUserToConfig]", e);
+    // }
+    
+    const currentUserData = {
             address: address,
-            subscribed: subscribed
+            url: `${config.publicApiHost}/${address}`
         };
-
-        console.log('https://localhost:3000/----------subscribed', subscribed)
-        console.log('https://localhost:3000/----------currentUserData', currentUserData)
-    } catch (e) {
-        console.warn("[_utils][subscribed][addNewUserToConfig]", e);
-    }
+        
+        console.log('currentUserData', currentUserData)
     try {
-        newConfig = await updateUserConfig({ currentUserData });
-        console.log('newConfig[updateUserConfig]', newConfig);
+        subscribed = await updateUserConfig({ currentUserData });
+        console.log('newConfig[updateUserConfig]', subscribed);
     } catch (e) {
         console.warn("[_utils][subscribed][addNewUserToConfig]", e);
     }
-
-
-    console.log('newConfig---newConfig---newConfig---newConfig', newConfig);
 
     try {
         await putObjectS3({
             bucket: config.bucket,
             key: config.configFile,
-            data: stringify(newConfig),
+            data: stringify(subscribed),
             // data: stringify([]),
             type: "application/json",
         });
@@ -115,4 +122,4 @@ const addNewUserToConfig = async ({ address }) => {
 };
 
 
-module.exports = { getSubscribed, addNewUserToConfig };
+module.exports = { getSubscribed, addNewUserToConfig, getAddresses, generateSubscribed };

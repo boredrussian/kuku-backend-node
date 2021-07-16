@@ -10,6 +10,7 @@ const fsp = require("fs/promises");
 const { nanoid } = require("nanoid");
 const mime = require("mime");
 const { putObjectS3 } = require("../../../lib/s3");
+const { getFoldersName } = require("../_utils");
 const stringify = require('fast-json-stable-stringify');
 
 const getHash = ({ data }) => {
@@ -27,7 +28,7 @@ const getHash = ({ data }) => {
 };
 
 
-const fileUpload = ({ event }) => {
+const fileUpload =  ({ event }) => {
 
 
     return new Promise((resolve, reject) => {
@@ -76,14 +77,24 @@ const fileUpload = ({ event }) => {
             const hash_58 = bs58.encode(bytes);
             const fileExtension = mime.getExtension(result.files[0].contentType);
             hashFileName = `${hash_58}.${fileExtension}`;
-            const saveToPath = `${config.saveImgPathS3}/${hashFileName}`;
-
+            
+            
+            // const saveToPath = `${config.savePostFile}/${hashFileName}`;
+            
+            
+            
+            
+           
             response = {
                 statusCode: 200,
                 body: stringify({ hash: hash_58, type: result.files[0].contentType })
             }
+            
+             const folders = getFoldersName(hash_58);
+             const saveToPath = `${config.savePostFile}/${folders.first}/${folders.second}/${folders.fileName}.${fileExtension}`;
+            
+             console.log('saveToPath', saveToPath);
             try {
-
                 await putObjectS3({
                     bucket: config.bucket,
                     key: saveToPath,

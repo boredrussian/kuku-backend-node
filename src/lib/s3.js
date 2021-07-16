@@ -32,9 +32,6 @@ const putObjectS3 = async ({
 };
 
 
-
-
-
 const getObject = async ({ bucket, key }) => {
     try {
         const params = {

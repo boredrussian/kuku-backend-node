@@ -31,11 +31,11 @@ module.exports.getUserLogin = async ({ event }) => {
     return response;
   }
 
-  try {
-    subscribed = await getSubscribed({ userAddress: user?.address });
-  } catch (e) {
-    console.warn("[getUser][getSubscribed]", e);
-  }
+  // try {
+  //   subscribed = await getSubscribed({userAddress: user?.address} );
+  // } catch (e) {
+  //   console.warn("[getUser][getSubscribed]", e);
+  // }
 
   try {
     if (user?.serverSessionProof !== serverSessionProof) {
@@ -49,12 +49,14 @@ module.exports.getUserLogin = async ({ event }) => {
     });
 
 
+
     const data = {
       login: user?.login,
       address: user?.address,
       wif: user?.encryptedWif,
       token: accessToken,
-      subscribed: subscribed
+      subscribed: user?.subscribed,
+      hosts: user?.hosts
     };
 
     response = {

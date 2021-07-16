@@ -69,6 +69,11 @@ Resources:
           Properties:
             Method: post
             Path: /user
+        userUpdate:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user/update
         GetSubscribed:
           Type: HttpApi
           Properties:

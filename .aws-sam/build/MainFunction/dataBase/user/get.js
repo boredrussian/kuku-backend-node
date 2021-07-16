@@ -35,7 +35,6 @@ module.exports.getUserByLogin = async ({ tableName, login }) => {
 
 
 
-
 module.exports.getUserByAccessToken = async ({ tableName, token }) => {
     let result;
     const params = {
