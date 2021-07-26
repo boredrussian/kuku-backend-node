@@ -1,7 +1,7 @@
 
 const { config } = require('../../../../config');
-const { getIndex } = require('../../../../dataBase/post/get');
-const { putFirstDataPost } = require('../../../../dataBase/post/put');
+const { getIndex } = require('../../../../dataBase/index/get');
+// const { putFirstDataPost } = require('../../../../dataBase/post/put');
 const { updateIndexDb } = require('../../../../dataBase/post/update');
 
 
@@ -13,25 +13,28 @@ exports.updateIndex = async ({ post }) => {
     console.warn("[updateIndex][getIndex]", e);
   }
 
-  if (!currentIndex) {
-    try {
-      await putFirstDataPost({
-        tableName: config.indexTableName,
-        post
-      });
-    }
-    catch (e) {
-      console.warn('[updateIndex][putFirstData]', e);
-    }
+ 
+// after create first index data it is does't nee
+  // if (!currentIndex) {
+  //   try {
+  //     await putFirstDataPost({
+  //       tableName: config.indexTableName,
+  //       address: post.source.address,
+  //       firstData: {posts : [post]}
+  //     });
+  //   }
+  //   catch (e) {
+  //     console.warn('[updateIndex][putFirstData]', e);
+  //   }
 
-  } else {
+  // } else {
     try {
       await updateIndexDb({ tableName: config.indexTableName, currentIndex, receivedPost: post });
     }
     catch (e) {
       console.warn('[updateIndex][updateIndexDb]', e);
     }
-  }
+  // }
 
 
 

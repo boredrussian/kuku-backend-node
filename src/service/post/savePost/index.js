@@ -1,6 +1,6 @@
 const { putFile } = require('./utilities/putFile');
 const { updateIndex } = require('./utilities/updateIndex');
-const { checkIsPostValid } = require('./utilities/isPostValid');
+const { checkIsObjectValid } = require('../../../lib/crypto');
 const parseJson = require("parse-json");
 const CryptoJS = require('crypto-js');
 
@@ -22,17 +22,19 @@ exports.savePost = async ({ event }) => {
         console.warn('[savePost][parseJson]', e)
     }
 
+    
     try {
-          isValid =  checkIsPostValid({ post });
+          isValid =  checkIsObjectValid({ objData: post, address: post.source.address });
           console.log('isValid!!!!!!!', isValid)
       } catch (e) {
+              console.warn('[savePost][checkIsObjectValid]', e)
           isValid = false;
           // TODO add error response
           return;
       }  
 
     if (isValid) {
-          console.log('1111111111isValid!!!!!!!', isValid)
+          console.log('1111111111isValid!!!!!!!', isValid);
         await putFile({ post });
         if (addToIndex) {
             await updateIndex({ post });

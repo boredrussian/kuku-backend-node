@@ -58,7 +58,7 @@ module.exports.getUserByAccessToken = async ({ tableName, token }) => {
 };
 
 
-module.exports.getSources = async ({ tableName }) => {
+module.exports.getUsers = async ({ tableName }) => {
     let result;
 
     const params = {

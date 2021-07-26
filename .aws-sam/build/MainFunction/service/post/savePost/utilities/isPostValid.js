@@ -5,21 +5,20 @@ const parseJson = require("parse-json");
 const { isPostValid } = require("../../../../lib/crypto");
 
 
-const getPostJsonFromObj = ({ post }) => {
-    let postCopy = parseJson(stringify(post));
-    if (postCopy.hash || postCopy.signatures) {
-        delete postCopy.hash;
-        delete postCopy.signatures;
+const getJsonFromObj = ({ objectData }) => {
+    let objectCopy = parseJson(stringify(objectData));
+    if (objectCopy.hash || objectCopy.signatures) {
+        delete objectCopy.hash;
+        delete objectCopy.signatures;
     }
-    postCopy = sortKeys(postCopy);
-    return stringify(postCopy);
+    objectCopy = sortKeys(objectCopy);
+    return stringify(objectCopy);
 };
-
 
 exports.checkIsPostValid =  ({ post }) => {
     const { address } = post.source;
     const { signatures } = post;
-    const message = getPostJsonFromObj({ post: post });
+    const message = getJsonFromObj({ post: post });
     let isValid;
     try {
         isValid =  isPostValid({

@@ -7,6 +7,7 @@ const { getEphemeralKeys } = require('./service/user/login/getEphemeralKeys');
 const { getSessionProofs } = require('./service/user/login/getSessionProofs');
 const { getUserLogin } = require('./service/user/login/getUserLogin');
 const { getUser } = require('./service/user/getUser');
+const { userUpdate } = require('./service/user/userUpdate');
 const { getSubscribed } = require('./service/user/getSubscribed');
 
 
@@ -23,6 +24,7 @@ exports.lambdaHandler = async (event, context) => {
     };
 
     console.log('path---', path);
+
 
     switch (path) {
         case httpApi.savePost.path:
@@ -49,11 +51,17 @@ exports.lambdaHandler = async (event, context) => {
         case httpApi.getUser.path:
             response = await getUser({ event });
             break;
+        case httpApi.userUpdate.path:
+            response = await userUpdate({ event });
+            break;
         case httpApi.getSubscribed.path:
             response = await getSubscribed({ event });
             break;
         case httpApi.fileUpload.path:
             response = await fileUpload({ event });
+            break;
+        case httpApi.userFollow.path:
+            // response = await fileUpload({ event });
             break;
         default:
             response = notFoundResponse;

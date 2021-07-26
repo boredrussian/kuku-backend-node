@@ -56,7 +56,7 @@ module.exports.getUserLogin = async ({ event }) => {
       wif: user?.encryptedWif,
       token: accessToken,
       subscribed: user?.subscribed,
-      hosts: user?.hosts
+      source: user?.source
     };
 
     response = {

@@ -24,8 +24,8 @@ module.exports.getUser = async ({ event }) => {
     try {
         user = await getUserByAccessToken({ tableName: config.userTableName, token });
          try {
-        // subscribed = await getSubscribed({userAddress: user?.address});
-                console.log('subscribed-1---------111-111-111' , subscribed)
+                // subscribed = await getSubscribed({userAddress: user?.address});
+                console.log('subscribed-1---------111-111-111' , user)
         
             } catch (e) {
         console.warn("[getUser][getSubscribed]", e);
@@ -35,7 +35,7 @@ module.exports.getUser = async ({ event }) => {
                 address: user?.address,
                 userName: user?.login,
                 subscribed: user?.subscribed,
-                hosts: user?.hosts,
+                source: user?.source,
             };
 
             response = {

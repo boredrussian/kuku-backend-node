@@ -10,19 +10,20 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.putFirstDataPost = async ({
     tableName,
-    post
+    address,
+    firstData
 }) => {
 
-    const firstData = {
-        posts: [post]
-    };
+    // const firstData = {
+    //     posts: [post]
+    // };
 
 
     try {
         const params = {
             TableName: tableName,
             Item: {
-                address: post.source.address,
+                address: address,
                 index: stringify(firstData),
                 version: 0,
             },

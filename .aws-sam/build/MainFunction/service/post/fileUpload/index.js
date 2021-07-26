@@ -87,7 +87,7 @@ const fileUpload =  ({ event }) => {
            
             response = {
                 statusCode: 200,
-                body: stringify({ hash: hash_58, type: result.files[0].contentType })
+                body: stringify({ hash: hash_58, contentType: result.files[0].contentType })
             }
             
              const folders = getFoldersName(hash_58);
@@ -99,7 +99,7 @@ const fileUpload =  ({ event }) => {
                     bucket: config.bucket,
                     key: saveToPath,
                     data: result.files[0].file,
-                    type: result.files[0].contentType,
+                    contentType: result.files[0].contentType,
                 });
             } catch (e) {
                 console.warn("putObject-error", e);

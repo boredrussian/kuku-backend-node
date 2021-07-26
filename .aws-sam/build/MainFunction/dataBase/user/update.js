@@ -93,3 +93,29 @@ module.exports.updateUsersSubscribed = async ({
     const result = await dynamoDb.update(params).promise();
     return result;
 };
+
+
+module.exports.updateUser = async ({
+    tableName,
+    address,
+    source,
+   }) => {
+    const params = {
+        TableName: tableName,
+        Key: {
+            address: address,
+        },
+        UpdateExpression: "set #source = :newSource",
+        ExpressionAttributeNames: {
+      "#source": "source",
+     },
+        ExpressionAttributeValues: {
+            ":newSource": source,
+         },
+        ReturnValues: "ALL_NEW",
+    };
+
+    const result = await dynamoDb.update(params).promise();
+    return result;
+};
+

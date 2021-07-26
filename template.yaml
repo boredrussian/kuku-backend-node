@@ -84,6 +84,11 @@ Resources:
           Properties:
             Method: post
             Path: /file/upload
+        UserFollow:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user/follow
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion

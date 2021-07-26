@@ -43,6 +43,14 @@ exports.httpApi = {
         method: 'post',
         path: '/user'
     },
+    userUpdate: {
+        method: 'post',
+        path: '/user/update'
+    },
+    userFollow: {
+        method: 'post',
+        path: '/user/follow'
+    },
     getSubscribed: {
         method: 'get',
         path: '/subscribed'

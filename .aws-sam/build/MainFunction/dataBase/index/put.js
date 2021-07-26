@@ -8,7 +8,7 @@ AWS.config.update({
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 
-module.exports.putFirstDataPost = async ({
+module.exports.putFirstIndexData = async ({
     tableName,
     address,
     firstData

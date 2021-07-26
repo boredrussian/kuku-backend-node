@@ -10,14 +10,14 @@ const putObjectS3 = async ({
     bucket,
     key,
     data,
-    type,
+    ContentType,
 }) => {
     let res;
     const params = {
         Bucket: bucket,
         Key: key,
         Body: data,
-        ContentType: type,
+        ContentType: ContentType,
     };
 
     console.log("params", params);
@@ -30,6 +30,9 @@ const putObjectS3 = async ({
     return res;
 
 };
+
+
+
 
 
 const getObject = async ({ bucket, key }) => {
