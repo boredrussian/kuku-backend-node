@@ -73,19 +73,19 @@ module.exports.updateAccessToken = async ({
 };
 
 
-module.exports.updateUsersSubscribed = async ({
+module.exports.updateSubscribe = async ({
     tableName,
     address,
-    accessToken,
+    subscribed
 }) => {
     const params = {
         TableName: tableName,
         Key: {
             address: address,
         },
-        UpdateExpression: "set accessToken = :accessToken",
+        UpdateExpression: "set subscribed = :subscribed",
         ExpressionAttributeValues: {
-            ":accessToken": accessToken,
+            ":subscribed": subscribed,
         },
         ReturnValues: "ALL_NEW",
     };

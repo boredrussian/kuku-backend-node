@@ -9,12 +9,10 @@ const { getUserLogin } = require('./service/user/login/getUserLogin');
 const { getUser } = require('./service/user/getUser');
 const { userUpdate } = require('./service/user/userUpdate');
 const { getSubscribed } = require('./service/user/getSubscribed');
-
-
+const { changeFollowing } = require('./service/user/changeFollowing');
 
 
 const { httpApi } = require('./config');
-
 
 exports.lambdaHandler = async (event, context) => {
     let response;
@@ -25,14 +23,13 @@ exports.lambdaHandler = async (event, context) => {
 
     console.log('path---', path);
 
-
     switch (path) {
         case httpApi.savePost.path:
             response = await savePost({ event });
             break;
-        case httpApi.getIndex.path:
-            response = await getIndexService({ event });
-            break;
+        // case httpApi.getIndex.path:
+        //     response = await getIndexService({ event });
+        //     break;
         case httpApi.registerCheckLogin.path:
             response = await checkLogin({ event });
             break;
@@ -61,7 +58,7 @@ exports.lambdaHandler = async (event, context) => {
             response = await fileUpload({ event });
             break;
         case httpApi.userFollow.path:
-            // response = await fileUpload({ event });
+              response = await changeFollowing({ event });
             break;
         default:
             response = notFoundResponse;

@@ -33,6 +33,36 @@ module.exports.getUserByLogin = async ({ tableName, login }) => {
     return userResult;
 };
 
+module.exports.getUserByAddress = async ({ tableName, address }) => {
+    let userResData, userResult;
+    let params = {
+        TableName: tableName,
+        // Key: {
+        //     address: address,
+        // },
+        
+        KeyConditionExpression: "#address = :address",
+        ExpressionAttributeNames: {
+            "#address": "address",
+        },
+        ExpressionAttributeValues: {
+            ":address": address,
+        },
+         };
+
+    try {
+        userResData = await dynamoDb.query(params).promise();
+    }
+    catch (e) {
+        console.warn('[getUserByAddress][query]', e);
+    }
+
+    if (userResData?.Items && userResData.Items.length > 0) {
+        userResult = userResData.Items[0];
+    }
+    return userResult;
+};
+
 
 
 module.exports.getUserByAccessToken = async ({ tableName, token }) => {
