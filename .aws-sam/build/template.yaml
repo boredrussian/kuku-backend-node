@@ -86,11 +86,21 @@ Resources:
           Properties:
             Method: post
             Path: /user/follow
-        Inbox:
+        SetInbox:
           Type: HttpApi
           Properties:
             Method: post
             Path: /inbox
+        GetInbox:
+          Type: HttpApi
+          Properties:
+            Method: get
+            Path: /inbox
+        UpdateInbox:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /inbox/update
   DepLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:

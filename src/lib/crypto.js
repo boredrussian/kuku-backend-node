@@ -25,6 +25,9 @@ const bodyEncrypted = ({ event }) => {
         const encodedWord = CryptoJS.enc.Base64.parse(event.body);
         const encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
         body = parseJson(encoded);
+        
+        
+        console.log('body', body)
     }
     catch (e) {
         console.warn('[lib][][eventBodyEncrypted]', e);

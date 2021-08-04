@@ -14,11 +14,6 @@ module.exports.putFirstIndexData = async ({
     firstData
 }) => {
 
-    // const firstData = {
-    //     posts: [post]
-    // };
-
-
     try {
         const params = {
             TableName: tableName,

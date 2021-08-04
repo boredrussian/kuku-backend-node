@@ -4,6 +4,7 @@ exports.config = {
     saveImgFile: 'public/static/img',
     configFile: 'public/config.json',
     region: "us-west-2",
+    inboxTableName: "inbox",
     indexTableName: "signed-index",
     userTableName: "users",
     jwtSecret: "JWT_SECRET_ACCESS",
@@ -15,10 +16,10 @@ exports.httpApi = {
         method: 'post',
         path: '/post'
     },
-    getIndex: {
-        method: 'get',
-        path: '/book'
-    },
+    // getIndex: {
+    //     method: 'get',
+    //     path: '/book'
+    // },
     register: {
         method: 'post',
         path: '/register'
@@ -51,12 +52,26 @@ exports.httpApi = {
         method: 'post',
         path: '/user/follow'
     },
+    fileUpload: {
+        method: 'post',
+        path: '/file/upload'
+    },
+    addInbox: {
+        method: 'post',
+        path: '/inbox'
+    },
+    updateInbox: {
+        method: 'post',
+        path: '/inbox/'
+    },
+    
+    
     getSubscribed: {
         method: 'get',
         path: '/subscribed'
     },
-    fileUpload: {
-        method: 'post',
-        path: '/file/upload'
+    getInbox: {
+        method: 'get',
+        path: '/inbox'
     },
 };

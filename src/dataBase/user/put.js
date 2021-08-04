@@ -19,6 +19,9 @@ module.exports.addUser = async ({
     subscribed,
     source
 }) => {
+    
+    
+   
     const params = {
         TableName: tableName,
         Item: {

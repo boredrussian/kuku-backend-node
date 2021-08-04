@@ -10,6 +10,9 @@ const { getUser } = require('./service/user/getUser');
 const { userUpdate } = require('./service/user/userUpdate');
 const { getSubscribed } = require('./service/user/getSubscribed');
 const { changeFollowing } = require('./service/user/changeFollowing');
+const { addInbox, getInbox, updateInbox } = require('./service/inbox');
+ 
+ 
 
 
 const { httpApi } = require('./config');
@@ -22,8 +25,10 @@ exports.lambdaHandler = async (event, context) => {
     };
 
     console.log('path---', path);
+      console.log('method---', method);
 
-    switch (path) {
+if(method === 'POST'){
+   switch (path) {
         case httpApi.savePost.path:
             response = await savePost({ event });
             break;
@@ -51,18 +56,38 @@ exports.lambdaHandler = async (event, context) => {
         case httpApi.userUpdate.path:
             response = await userUpdate({ event });
             break;
-        case httpApi.getSubscribed.path:
-            response = await getSubscribed({ event });
-            break;
+       
         case httpApi.fileUpload.path:
             response = await fileUpload({ event });
             break;
         case httpApi.userFollow.path:
               response = await changeFollowing({ event });
             break;
+        case httpApi.addInbox.path:
+              response = await addInbox({ event });
+            break;
+        case httpApi.updateInbox.path:
+              response = await updateInbox({ event });
+            break;
         default:
             response = notFoundResponse;
-    }
+    } 
+}
+
+else if (method === 'GET'){
+      switch (path) {
+       case httpApi.getInbox.path:
+            response = await getInbox({ event });
+            break;
+       case httpApi.getSubscribed.path:
+            response = await getSubscribed({ event });
+            break;
+       default:
+            response = notFoundResponse;
+    } 
+}
+
+   
 
     if (!response) {
         response = notFoundResponse;
