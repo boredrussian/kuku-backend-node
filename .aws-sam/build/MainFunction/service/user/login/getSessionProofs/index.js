@@ -6,12 +6,12 @@ const srp = require('secure-remote-password/server');
 const stringify = require('fast-json-stable-stringify');
 const { config, prefixes } = require('../../../../config');
 const { bodyEncrypted } = require('../../../../lib/crypto');
-const { getUserByUserName_NonReletional } = require('../../../../dataBaseNonReletional/user/get');
-const { updateServerSessionProof_NonReletional } = require('../../../../dataBaseNonReletional/user/update');
+const { getUserByUserName_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
+const { updateServerSessionProof_NonRelational } = require('../../../../dataBaseNonRelational/user/update');
 
 
 module.exports.getSessionProofs = async ({ event }) => {
-    let userName, clientSessionProof, clientEphemeralPublic, user, user_NonReletional;
+    let userName, clientSessionProof, clientEphemeralPublic, user, user_NonRelational;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
@@ -29,14 +29,11 @@ module.exports.getSessionProofs = async ({ event }) => {
     } catch (e) {
         console.warn('[sessionProof][getUserByLogin]', e);
     }
-  
-      try {
-        user_NonReletional = await getUserByUserName_NonReletional({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
-        // if (!user_NonReletional) {
-        //     return response;
-        // }
+
+    try {
+        user_NonRelational = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
     } catch (e) {
-        console.warn("[getEphemeralKeys][getUserByLogin_NonReletional]", e);
+        console.warn("[getEphemeralKeys][getUserByLogin_NonRelational]", e);
         return response;
     }
 
@@ -58,8 +55,8 @@ module.exports.getSessionProofs = async ({ event }) => {
                 address: user.address,
                 serverSessionProof: serverSession.proof,
             });
-           
-            await updateServerSessionProof_NonReletional({
+
+            await updateServerSessionProof_NonRelational({
                 tableName: config.signedTableName,
                 userName: userName,
                 serverSessionProof: serverSession.proof,

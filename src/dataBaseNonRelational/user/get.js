@@ -6,7 +6,7 @@ AWS.config.update({
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-module.exports.getUserByUserName_NonReletional = async ({ tableName, userName, user_relation }) => {
+module.exports.getUserByUserName_NonRelational = async ({ tableName, userName, user_relation }) => {
     let userResData, userResult;
     
     const pkData = `${user_relation}-${userName}`;
@@ -33,7 +33,7 @@ module.exports.getUserByUserName_NonReletional = async ({ tableName, userName, u
 };
 
 
-module.exports.getUserNameByAddress_NonReletional = async ({ tableName, address, user_relation, source_relation }) => {
+module.exports.getUserNameByAddress_NonRelational = async ({ tableName, address, user_relation, source_relation }) => {
     let userResData, userResult;
     
     const skData = `${source_relation}-${address}`;
@@ -67,7 +67,7 @@ module.exports.getUserNameByAddress_NonReletional = async ({ tableName, address,
 
  
 
-module.exports.getUsers_NonReletional = async ({ tableName, source_relation  }) => {
+module.exports.getUsers_NonRelational = async ({ tableName, source_relation  }) => {
     let result;
 
     let params = {
@@ -93,7 +93,7 @@ module.exports.getUsers_NonReletional = async ({ tableName, source_relation  }) 
 
 
 
-module.exports.getSubscribed_NonReletional = async ({ tableName, subscribed_relation, userName, user_relation }) => {
+module.exports.getSubscribed_NonRelational = async ({ tableName, subscribed_relation, userName, user_relation }) => {
     let result;
 
   const pkData = `${user_relation}-${userName}`;

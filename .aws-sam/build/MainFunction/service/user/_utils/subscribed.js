@@ -25,19 +25,20 @@ const getUserSourcesArr = ({ users }) => {
     return sources;
 };
 
-const generateSubscribed = ({usersList}) => {
-    if(!Array.isArray(usersList)){
+const generateSubscribed = ({ usersList }) => {
+    if (!Array.isArray(usersList)) {
         return [];
     }
-    
-  const newUsers = usersList.map(user => { 
-      return {
-        address: user.address,
-        source:  user.source,
-        url: `${config.publicApiHost}/${user.address}`
-  }  });
- 
-  return newUsers;
+
+    const newUsers = usersList.map(user => {
+        return {
+            address: user.address,
+            source: user.source,
+            url: `${config.publicApiHost}/${user.address}`
+        }
+    });
+
+    return newUsers;
 }
 
 
@@ -46,7 +47,7 @@ const generateSubscribed = ({usersList}) => {
 
 
 
-// const generateSubscribed_NonReletional = ({usersList, currentUserAddress}) => {
+// const generateSubscribed_NonRelational = ({usersList, currentUserAddress}) => {
 //     if(!Array.isArray(usersList)){
 //         return [];
 //     }
@@ -56,7 +57,7 @@ const generateSubscribed = ({usersList}) => {
 //         address: source.address,
 //         url:  source.hosts.index
 //     }
-    
+
 // }).filter(userSub => userSub.address !== currentUserAddress)
 // }
 
@@ -93,7 +94,7 @@ const getSubscribed = async ({ userAddress = '' }) => {
         subscribedList = currentUserData.subscribed;
     } else {
         subscribedList = generateSubscribed({ usersList: usersData });
-        
+
     }
     return subscribedList;
 };
@@ -110,29 +111,29 @@ const updateUserConfig = async ({ currentUserData }) => {
             key: config.configFile,
         });
         usersData = parseJson(usersConfigJson);
-       } catch (e) {
+    } catch (e) {
         console.warn("[updateUserConfig]", e);
     }
 
     if (!Array.isArray(usersData) || usersData === []) {
         usersData = [currentUserData];
-        
-    }   usersData.push(currentUserData)
-    
+
+    } usersData.push(currentUserData)
+
     return usersData;
 }
 
 
 const addNewUserToConfig = async ({ source }) => {
     let subscribed;
-  
+
     const currentUserData = {
-            address: source.address,
-            source: source,
-            url: `${config.publicApiHost}/${source.address}`,
-        };
-        
-    
+        address: source.address,
+        source: source,
+        url: `${config.publicApiHost}/${source.address}`,
+    };
+
+
     try {
         subscribed = await updateUserConfig({ currentUserData });
         console.log('newConfig[updateUserConfig]', subscribed);
@@ -156,28 +157,28 @@ const addNewUserToConfig = async ({ source }) => {
 
 const updateUserSourceInConfig = async ({ source }) => {
     let subscribed, usersData;
-  
-      try {
+
+    try {
         const usersConfigJson = await getObject({
             bucket: config.bucket,
             key: config.configFile,
         });
         usersData = parseJson(usersConfigJson);
- 
+
     } catch (e) {
         console.warn("[subscribed][getSubscribed]", e);
     }
 
 
-const newUsersData = usersData.map(user => {
-    if(user.source.address === source.address){
-        user.source = source
-    }
-    return user
-});
+    const newUsersData = usersData.map(user => {
+        if (user.source.address === source.address) {
+            user.source = source
+        }
+        return user
+    });
 
- 
-  try {
+
+    try {
         await putObjectS3({
             bucket: config.bucket,
             key: config.configFile,
@@ -195,6 +196,8 @@ const newUsersData = usersData.map(user => {
 
 
 
-module.exports = { getSubscribed, addNewUserToConfig,
-getAddresses, generateSubscribed,
-getUserSourcesArr, updateUserSourceInConfig,  };
+module.exports = {
+    getSubscribed, addNewUserToConfig,
+    getAddresses, generateSubscribed,
+    getUserSourcesArr, updateUserSourceInConfig,
+};

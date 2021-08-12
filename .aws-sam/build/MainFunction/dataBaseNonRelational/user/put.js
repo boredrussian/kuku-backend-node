@@ -8,7 +8,7 @@ AWS.config.update({
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 
-module.exports.addUser_NonReletional = async ({
+module.exports.addUser_NonRelational = async ({
     tableName,
     address,
     encryptedWif,
@@ -18,10 +18,10 @@ module.exports.addUser_NonReletional = async ({
     accessToken,
     source
 }) => {
-    
+
     const pk = `${prefixes.user}-${login}`;
     const sk = `${prefixes.user}-${login}`;
-   
+
     const params = {
         TableName: tableName,
         Item: {
@@ -36,38 +36,38 @@ module.exports.addUser_NonReletional = async ({
             source
         },
     };
-    
-    
-    
+
+
+
     return await dynamoDb.put(params).promise();
 };
 
 
-module.exports.addUserSourceReletion_NonReletional = async ({
+module.exports.addUserSourceReletion_NonRelational = async ({
     tableName,
     address,
     login,
-    }) => {
-    
+}) => {
+
     const pk = `${prefixes.user}-${login}`;
     const sk = `${prefixes.source}-${address}`;
-   
+
     const params = {
         TableName: tableName,
         Item: {
             PK: pk,
             SK: sk,
-           },
+        },
     };
-    
-    
-    
+
+
+
     return await dynamoDb.put(params).promise();
 };
 
 
 
-module.exports.putSourceAndIndexInitial_NonReletional = async ({
+module.exports.putSourceAndIndexInitial_NonRelational = async ({
     tableName,
     address,
     sourceJson,
@@ -75,8 +75,8 @@ module.exports.putSourceAndIndexInitial_NonReletional = async ({
     version
 }) => {
 
- const pk = `${prefixes.source}-${address}`;
- const sk = `${prefixes.source}-${address}`;
+    const pk = `${prefixes.source}-${address}`;
+    const sk = `${prefixes.source}-${address}`;
 
     try {
         const params = {
@@ -89,8 +89,8 @@ module.exports.putSourceAndIndexInitial_NonReletional = async ({
                 version: version,
             },
         };
-        
-     await dynamoDb.put(params).promise();
+
+        await dynamoDb.put(params).promise();
     }
 
     catch (e) {
@@ -99,17 +99,17 @@ module.exports.putSourceAndIndexInitial_NonReletional = async ({
 
 };
 
- 
-module.exports.setUserSubscribed_NonReletional = async ({
+
+module.exports.setUserSubscribed_NonRelational = async ({
     tableName,
     currentUserName,
     subscribedAddress,
     subscribed_relation,
-    user_relation 
-    }) => {
+    user_relation
+}) => {
 
- const pk = `${user_relation}-${currentUserName}`;
- const sk = `${subscribed_relation}-${subscribedAddress}`;
+    const pk = `${user_relation}-${currentUserName}`;
+    const sk = `${subscribed_relation}-${subscribedAddress}`;
 
     try {
         const params = {
@@ -119,8 +119,8 @@ module.exports.setUserSubscribed_NonReletional = async ({
                 SK: sk,
             },
         };
-     console.warn('params-----23232323--------params', params);
-     await dynamoDb.put(params).promise();
+        console.warn('params-----23232323--------params', params);
+        await dynamoDb.put(params).promise();
     }
 
     catch (e) {

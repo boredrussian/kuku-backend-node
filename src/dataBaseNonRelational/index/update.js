@@ -9,7 +9,51 @@ AWS.config.update({
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-module.exports.updateIndexDb_NonReletional = async ({
+
+// tableName: config.signedTableName, newSource: source, source_relation : prefixes.source
+module.exports.updateIndexSource_NonRelational = async ({
+  tableName,
+  source_relation,
+  currentIndex,
+  newSource
+}) => {
+  let newIndexJson, newIndex;
+
+
+  const currentVersion = currentIndex?.version;
+  const newSourceJson = stringify(newSource);
+
+  console.warn('newSource', newSource)
+  console.warn('newSourceJson', newSourceJson)
+
+  const pkValue = `${source_relation}-${newSource.address}`;
+  const params = {
+    TableName: tableName,
+    Key: {
+      PK: pkValue,
+      SK: pkValue
+    },
+
+    UpdateExpression: "SET #sourceJson = :newSourceJson, #version = :version",
+    ConditionExpression: "#version = :expectedVersion",
+    ExpressionAttributeNames: {
+      "#sourceJson": "sourceJson",
+      "#version": "version",
+    },
+    ExpressionAttributeValues: {
+      ":newSourceJson": newSourceJson,
+      ":version": currentVersion + 1,
+      ":expectedVersion": currentVersion,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  await dynamoDb.update(params).promise();
+};
+
+
+
+module.exports.updateIndexDb_NonRelational = async ({
   tableName,
   currentIndex,
   receivedPost,
@@ -19,37 +63,37 @@ module.exports.updateIndexDb_NonReletional = async ({
 
   const currentVersion = currentIndex?.version;
   const indexJson = currentIndex?.indexJson;
-  
+
   try {
     postArray = parseJson(indexJson);
     if (Array.isArray(postArray)) {
       postArray.push(receivedPost);
     }
- 
+
     newIndexJson = stringify(postArray);
   } catch (e) {
-    console.warn("[updateIndexDb_NonReletional]", e);
+    console.warn("[updateIndexDb_NonRelational]", e);
   }
 
   const pkValue = `${source_relation}-${receivedPost.source.address}`;
-   const params = {
+  const params = {
     TableName: tableName,
     Key: {
       PK: pkValue,
       SK: pkValue
     },
-  
+
     UpdateExpression: "SET #indexJson = :newIndexJson, #version = :version",
     ConditionExpression: "#version = :expectedVersion",
     ExpressionAttributeNames: {
       "#indexJson": "indexJson",
       "#version": "version",
-     },
+    },
     ExpressionAttributeValues: {
       ":newIndexJson": newIndexJson,
       ":version": currentVersion + 1,
       ":expectedVersion": currentVersion,
-      },
+    },
     ReturnValues: "ALL_NEW",
   };
 
