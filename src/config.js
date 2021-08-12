@@ -4,6 +4,7 @@ exports.config = {
     saveImgFile: 'public/static/img',
     configFile: 'public/config.json',
     region: "us-west-2",
+    signedTableName: "signed",
     inboxTableName: "inbox",
     indexTableName: "signed-index",
     userTableName: "users",
@@ -11,15 +12,21 @@ exports.config = {
     publicApiHost: "https://v6i481ta1m.execute-api.us-west-2.amazonaws.com/prod"
 };
 
+
+
+exports.prefixes = {
+    user: 'user',
+    subscribed: 'subscribed',
+    source: 'source',
+    inboxpost: 'public/config.json',
+    
+};
+
 exports.httpApi = {
     savePost: {
         method: 'post',
         path: '/post'
     },
-    // getIndex: {
-    //     method: 'get',
-    //     path: '/book'
-    // },
     register: {
         method: 'post',
         path: '/register'
@@ -60,9 +67,9 @@ exports.httpApi = {
         method: 'post',
         path: '/inbox'
     },
-    updateInbox: {
+    updateInboxStatus: {
         method: 'post',
-        path: '/inbox/'
+        path: '/inbox/update'
     },
     
     

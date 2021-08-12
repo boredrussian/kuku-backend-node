@@ -4,11 +4,14 @@ const { updateServerSessionProof } = require('../../../../dataBase/user/update')
 const srp = require('secure-remote-password/server');
 // const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
-const { config } = require('../../../../config');
+const { config, prefixes } = require('../../../../config');
 const { bodyEncrypted } = require('../../../../lib/crypto');
+const { getUserByUserName_NonReletional } = require('../../../../dataBaseNonReletional/user/get');
+const { updateServerSessionProof_NonReletional } = require('../../../../dataBaseNonReletional/user/update');
+
 
 module.exports.getSessionProofs = async ({ event }) => {
-    let userName, clientSessionProof, clientEphemeralPublic, user;
+    let userName, clientSessionProof, clientEphemeralPublic, user, user_NonReletional;
     let response = {
         'statusCode': 404,
         'body': 'Login or password is invalid'
@@ -25,6 +28,16 @@ module.exports.getSessionProofs = async ({ event }) => {
         user = await getUserByLogin({ tableName: config.userTableName, login: userName });
     } catch (e) {
         console.warn('[sessionProof][getUserByLogin]', e);
+    }
+  
+      try {
+        user_NonReletional = await getUserByUserName_NonReletional({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
+        // if (!user_NonReletional) {
+        //     return response;
+        // }
+    } catch (e) {
+        console.warn("[getEphemeralKeys][getUserByLogin_NonReletional]", e);
+        return response;
     }
 
     if (user) {
@@ -44,6 +57,13 @@ module.exports.getSessionProofs = async ({ event }) => {
                 tableName: config.userTableName,
                 address: user.address,
                 serverSessionProof: serverSession.proof,
+            });
+           
+            await updateServerSessionProof_NonReletional({
+                tableName: config.signedTableName,
+                userName: userName,
+                serverSessionProof: serverSession.proof,
+                user_relation: prefixes.user
             });
 
             response = {

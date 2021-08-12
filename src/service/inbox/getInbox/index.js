@@ -27,8 +27,6 @@ const mentionsStatusFilter = ({arr, status}) => {
 }
 
 
- 
-  
 
 
 
@@ -40,23 +38,15 @@ const getInbox = async ({ event }) => {
         'body': `Error was occurred [inbox service] [getInbox]`
     };
     
-    
     const parsedHash = queryString.parse(event.rawQueryString);
     const address = parsedHash.address;
    
     try {
     const mentions =  await getInboxesByAddress({ tableName: config.inboxTableName, address: address});
     
-  
-   
- 
-    newMentions = mentionsStatusFilter({arr:mentions, status: 'new' })
-    console.log('mentions', mentions);
-    console.log('newMentions', newMentions);
-    
-       response = {
+   response = {
         'statusCode': 200,
-        'body':  stringify(newMentions)
+        'body':  stringify(mentions)
     };
     } catch (e) {
         console.warn("[getInbox][getInboxByAddress]", e);

@@ -1,5 +1,4 @@
 const { savePost } = require('./service/post/savePost');
-const { getIndexService } = require('./service/post/getIndex');
 const { fileUpload } = require('./service/post/fileUpload');
 const { register } = require('./service/user/register');
 const { checkLogin } = require('./service/user/register/checkLogin');
@@ -25,16 +24,13 @@ exports.lambdaHandler = async (event, context) => {
     };
 
     console.log('path---', path);
-      console.log('method---', method);
+    console.log('method---', method);
 
 if(method === 'POST'){
    switch (path) {
         case httpApi.savePost.path:
             response = await savePost({ event });
             break;
-        // case httpApi.getIndex.path:
-        //     response = await getIndexService({ event });
-        //     break;
         case httpApi.registerCheckLogin.path:
             response = await checkLogin({ event });
             break;
@@ -56,8 +52,7 @@ if(method === 'POST'){
         case httpApi.userUpdate.path:
             response = await userUpdate({ event });
             break;
-       
-        case httpApi.fileUpload.path:
+       case httpApi.fileUpload.path:
             response = await fileUpload({ event });
             break;
         case httpApi.userFollow.path:
@@ -66,7 +61,7 @@ if(method === 'POST'){
         case httpApi.addInbox.path:
               response = await addInbox({ event });
             break;
-        case httpApi.updateInbox.path:
+        case httpApi.updateInboxStatus.path:
               response = await updateInbox({ event });
             break;
         default:
@@ -86,8 +81,6 @@ else if (method === 'GET'){
             response = notFoundResponse;
     } 
 }
-
-   
 
     if (!response) {
         response = notFoundResponse;

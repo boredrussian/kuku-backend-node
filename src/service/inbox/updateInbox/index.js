@@ -10,6 +10,9 @@ const { updateStatus } = require("../../../dataBase/inbox/update");
 // const { updateUsersSubscribed } = require("../../../dataBase/user/update");
 // const { addNewUserToConfig, generateSubscribed, getUserSourcesArr } = require("../_utils/subscribed");
 
+
+//  new/rejected/accepted
+
 const { bodyEncrypted } = require('../../../lib/crypto');
 
 

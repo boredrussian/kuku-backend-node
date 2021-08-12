@@ -19,9 +19,11 @@ module.exports.getUserByLogin = async ({ tableName, login }) => {
             ":login": login,
         },
     };
+ 
 
     try {
         userResData = await dynamoDb.query(params).promise();
+         console.log('userResData---userResData---userResData', userResData)
     }
     catch (e) {
         console.warn('[getUserByLogin][query]', e);

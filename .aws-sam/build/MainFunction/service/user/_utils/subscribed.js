@@ -36,11 +36,39 @@ const generateSubscribed = ({usersList}) => {
         source:  user.source,
         url: `${config.publicApiHost}/${user.address}`
   }  });
-  
-  console.log('newUsers-========++++++++++++newUsers', newUsers)
-  
+ 
   return newUsers;
 }
+
+
+
+
+
+
+
+// const generateSubscribed_NonReletional = ({usersList, currentUserAddress}) => {
+//     if(!Array.isArray(usersList)){
+//         return [];
+//     }
+// return usersList.map(user => {
+//     const source = parseJson(user.sourceJson);
+//     return {
+//         address: source.address,
+//         url:  source.hosts.index
+//     }
+    
+// }).filter(userSub => userSub.address !== currentUserAddress)
+// }
+
+
+
+
+
+
+
+
+
+
 
 
 const getSubscribed = async ({ userAddress = '' }) => {
@@ -52,7 +80,6 @@ const getSubscribed = async ({ userAddress = '' }) => {
             key: config.configFile,
         });
         usersData = parseJson(usersConfigJson);
-
     } catch (e) {
         console.warn("[subscribed][getSubscribed]", e);
     }
@@ -66,11 +93,7 @@ const getSubscribed = async ({ userAddress = '' }) => {
         subscribedList = currentUserData.subscribed;
     } else {
         subscribedList = generateSubscribed({ usersList: usersData });
-        // subscribedList = addresses.map(adr => {
-        //     return ({
-        //         url: `${config.publicApiHost}/${adr}`,
-        //     });
-        // });
+        
     }
     return subscribedList;
 };
@@ -109,7 +132,7 @@ const addNewUserToConfig = async ({ source }) => {
             url: `${config.publicApiHost}/${source.address}`,
         };
         
-        console.log('currentUserData', currentUserData)
+    
     try {
         subscribed = await updateUserConfig({ currentUserData });
         console.log('newConfig[updateUserConfig]', subscribed);
@@ -140,8 +163,7 @@ const updateUserSourceInConfig = async ({ source }) => {
             key: config.configFile,
         });
         usersData = parseJson(usersConfigJson);
-console.log('usersData----------------------1111', usersData)
-console.log('usersData----------------------1111', usersData)
+ 
     } catch (e) {
         console.warn("[subscribed][getSubscribed]", e);
     }
@@ -154,8 +176,7 @@ const newUsersData = usersData.map(user => {
     return user
 });
 
-console.log('newUsersData----------------------2222222', usersData)
-console.log('newUsersData----------------------2222222', usersData)
+ 
   try {
         await putObjectS3({
             bucket: config.bucket,
@@ -174,4 +195,6 @@ console.log('newUsersData----------------------2222222', usersData)
 
 
 
-module.exports = { getSubscribed, addNewUserToConfig, getAddresses, generateSubscribed, getUserSourcesArr, updateUserSourceInConfig };
+module.exports = { getSubscribed, addNewUserToConfig,
+getAddresses, generateSubscribed,
+getUserSourcesArr, updateUserSourceInConfig,  };
