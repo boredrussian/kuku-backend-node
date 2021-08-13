@@ -14,32 +14,13 @@ Globals:
       AllowHeaders: "'content-type'"
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
-Resources:
-  SavePostFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: src/
-      Handler: service/post/savePost/app.lambdaHandler
-      Runtime: nodejs14.x
-      Role: arn:aws:iam::164620743841:role/lambda-execution-role # Pre-existing role
-      Environment:
-        Variables:
-          TEST_2: Value345
-      Layers:
-        - !Ref DepLayer
-        - !Ref ConfigLayer
-      Events:
-        SavePost:
-          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /post
-            Method: post
 
-  GetIndexFunction:
+Resources:
+  MainFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: src/
-      Handler: service/post/getIndex/app.lambdaHandler
+      Handler: /app.lambdaHandler
       Runtime: nodejs14.x
       Role: arn:aws:iam::164620743841:role/lambda-execution-role # Pre-existing role
       Environment:
@@ -47,13 +28,82 @@ Resources:
           TEST_2: Value345
       Layers:
         - !Ref DepLayer
-        - !Ref ConfigLayer
       Events:
         SavePost:
-          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi
           Properties:
-            Path: /book
+            Method: post
+            Path: /post
+        GetIndex:
+          Type: HttpApi
+          Properties:
             Method: get
+            Path: /book
+        Register:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register
+        CheckLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /register/checkLogin
+        ExchangeEphemeralKeysFirstStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/exchangeEphemeralKeys
+        ValidateSessionProofsSecondStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/validateSessionProofs
+        GetUserTokenThirdLoginStepLogin:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /login/getUserToken
+        GetUser:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user
+        userUpdate:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user/update
+        GetSubscribed:
+          Type: HttpApi
+          Properties:
+            Method: get
+            Path: /subscribed
+        UploadFile:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /file/upload
+        UserFollow:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /user/follow
+        SetInbox:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /inbox
+        GetInbox:
+          Type: HttpApi
+          Properties:
+            Method: get
+            Path: /inbox
+        UpdateInbox:
+          Type: HttpApi
+          Properties:
+            Method: post
+            Path: /inbox/update
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion
@@ -61,17 +111,6 @@ Resources:
       LayerName: singed-app-dependencies
       Description: Dependencies for  singed-app
       ContentUri: dependencies/
-      CompatibleRuntimes:
-        - nodejs14.x
-      LicenseInfo: "MIT"
-      RetentionPolicy: Retain
-
-  ConfigLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: singed-app-config
-      Description: Config for  singed-app
-      ContentUri: config/
       CompatibleRuntimes:
         - nodejs14.x
       LicenseInfo: "MIT"
