@@ -26,8 +26,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - "dynamodb:Query"
-                Resource: "arn:aws:dynamodb:us-west-2:164620743841:table/signed-index"
-  Api:
+                Resource: "arn:aws:dynamodb:us-west-2:164620743841:table/signed"
+  IndexApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
@@ -41,7 +41,24 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: index-openapi.yaml
+  TagApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'POST, GET'"
+        AllowHeaders: "'X-Forwarded-For'"
+        AllowOrigin: "'*'"
+      OpenApiVersion: 3.0.2
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: tag-openapi.yaml
 Outputs:
   IndexUrl:
     Description: Public Index URL
-    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+    Value: !Sub https://${IndexApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+  TagUrl:
+    Description: Public Tag URL
+    Value: !Sub https://${TagApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}

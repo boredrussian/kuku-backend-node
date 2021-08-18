@@ -31,15 +31,15 @@ paths:
               - |-
                 { 
                   "TableName": "${tableName}",
-                  "PrimaryKey": "address", 
-                  "KeyConditionExpression": "address = :v1",
+                  "PrimaryKey": "PK", 
+                  "KeyConditionExpression": "PK = :v1 and SK = :v1",
                   "ExpressionAttributeValues": {
                       ":v1": {
-                          "S": "$input.params("address").replaceAll(".json", "")"
+                          "S": "source-$input.params("address").replaceAll(".json", "")"
                       }
                   }
                 }
-              - { tableName: "signed-index" }
+              - { tableName: "signed" }
         responses:
           default:
             statusCode: "200"
@@ -49,7 +49,7 @@ paths:
                                 #set($context.responseOverride.status = 404)
                                 {"error": "Address not found"}
                                 #else
-                                $input.path("Items[0].index.S")
+                                $input.path("Items[0].indexJson.S")
                                 #end'
         passthroughBehavior: "when_no_match"
         httpMethod: POST
