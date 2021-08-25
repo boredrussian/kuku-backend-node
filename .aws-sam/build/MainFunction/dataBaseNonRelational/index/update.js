@@ -13,20 +13,17 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 // tableName: config.signedTableName, newSource: source, source_relation : prefixes.source
 module.exports.updateIndexSource_NonRelational = async ({
   tableName,
-  source_relation,
+  sourceRelation,
   currentIndex,
   newSource
 }) => {
   let newIndexJson, newIndex;
 
-
   const currentVersion = currentIndex?.version;
   const newSourceJson = stringify(newSource);
 
-  console.warn('newSource', newSource)
-  console.warn('newSourceJson', newSourceJson)
 
-  const pkValue = `${source_relation}-${newSource.address}`;
+  const pkValue = `${sourceRelation}-${newSource.address}`;
   const params = {
     TableName: tableName,
     Key: {
@@ -48,15 +45,21 @@ module.exports.updateIndexSource_NonRelational = async ({
     ReturnValues: "ALL_NEW",
   };
 
+
+  console.warn('params', params)
+
+
   await dynamoDb.update(params).promise();
 };
+
 
 
 module.exports.updateIndexDb_NonRelational = async ({
   tableName,
   currentIndex,
+  address,
   receivedPost,
-  source_relation
+  sourceRelation
 }) => {
   let newIndexJson, postArray;
 
@@ -70,11 +73,14 @@ module.exports.updateIndexDb_NonRelational = async ({
     }
 
     newIndexJson = stringify(postArray);
+    
+    console.warn('newIndexJson', newIndexJson);
+    
   } catch (e) {
     console.warn("[updateIndexDb_NonRelational]", e);
   }
 
-  const pkValue = `${source_relation}-${receivedPost.source.address}`;
+  const pkValue = `${sourceRelation}-${address}`;
   const params = {
     TableName: tableName,
     Key: {

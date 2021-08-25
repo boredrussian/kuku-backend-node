@@ -5,7 +5,7 @@ const { getUserByAddress } = require('../../../../dataBase/user/get');
 const { getUserNameByAddress_NonRelational, getUserByUserName_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
 const { updateSubscribe } = require('../../../../dataBase/user/update');
 const { setUserSubscribed_NonRelational } = require("../../../../dataBaseNonRelational/user/put");
-const { removeSubscribed_NonRelational } = require("../../../../dataBaseNonRelational/user/delete");
+const { remoweSubscribed_NonRelational } = require("../../../../dataBaseNonRelational/user/delete");
 
 exports.updateFollowing = async ({ address, followSource, follow }) => {
     let result, subscribed, user, newUserSubscribed, user_NonRelational, userName_NonRelational;
@@ -53,15 +53,15 @@ exports.updateFollowing = async ({ address, followSource, follow }) => {
         userName_NonRelational = userName_NonRelational.slice(`${prefixes.user}-`.length);
     }
     catch (e) {
-        console.warn('[updateFollowing][getUserNameByAddress_NonRelational]', e);
+        console.warn('[updateFollowing][getUserLoginByAddress_NonRelational]', e);
     }
 
     try {
         user_NonRelational = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName_NonRelational, user_relation: prefixes.user });
-    } catch (e) {
-        console.warn("[getUserLogin][getUserByUserName_NonRelational]", e);
-    }
 
+    } catch (e) {
+        console.warn("[getUserLogin][getUserByLogin_NonRelational]", e);
+    }
 
     if (follow) {
         try {
@@ -76,7 +76,7 @@ exports.updateFollowing = async ({ address, followSource, follow }) => {
             console.warn('[register][setUserSubscribed]', e);
         }
     } else {
-        await removeSubscribed_NonRelational({
+           await remoweSubscribed_NonRelational({
             tableName: config.signedTableName,
             currentUserName: userName_NonRelational,
             subscribedAddress: address,
@@ -84,7 +84,13 @@ exports.updateFollowing = async ({ address, followSource, follow }) => {
             user_relation: prefixes.user,
         })
     }
- 
+
+    // try {
+    //   result = await updateSubscribed_NonRelational({tableName: config.signedTableName, userName, followSourceAddress: , isFollow: follow });
+    // }
+    // catch(e){
+
+    // }
 
     return result
 };

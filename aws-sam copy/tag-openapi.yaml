@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title:
+    signed.移动 Public Tag API
+  description:
+    Lambdaless fetching of source tag from DynamoDB
+  version: 1.0.0
+paths:
+  /{tag}:
+    get:
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+      parameters:
+        - name: 'address'
+          in: 'path'
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Tag'
+      x-amazon-apigateway-integration:
+        description: Retrieve a specific tag from the database 
+        credentials:  { 'Fn::GetAtt': PublicAPIRole.Arn }
+        uri: { 'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query' }
+        requestTemplates:
+          application/json:
+            Fn::Sub: 
+              - |-
+                { 
+                  "TableName": "${tableName}",
+                  "PrimaryKey": "PK", 
+                  "KeyConditionExpression": "PK = :v1 and SK = :v1",
+                  "ExpressionAttributeValues": {
+                      ":v1": {
+                          "S": "tag-$input.params("tag").replaceAll(".json", "")"
+                      }
+                  }
+                }
+              - { tableName: "signed" }
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: '#set($inputRoot = $input.path("$"))
+                                #if($inputRoot.Count == 0)
+                                #set($context.responseOverride.status = 404)
+                                {"error": "Address not found"}
+                                #else
+                                $input.path("Items[0].tagJson.S")
+                                #end'
+        passthroughBehavior: "when_no_match"
+        httpMethod: POST
+        type: AWS
+components:
+  schemas:
+    Empty:
+      type: object
+      description: Empty Schema
+  responses:
+  
+    Tag:
+      description: Tag
+      content:
+        application/json:
+          schema:
+            type: string

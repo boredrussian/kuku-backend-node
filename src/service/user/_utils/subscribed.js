@@ -42,27 +42,7 @@ const generateSubscribed = ({ usersList }) => {
 }
 
 
-
-
-
-
-
-// const generateSubscribed_NonRelational = ({usersList, currentUserAddress}) => {
-//     if(!Array.isArray(usersList)){
-//         return [];
-//     }
-// return usersList.map(user => {
-//     const source = parseJson(user.sourceJson);
-//     return {
-//         address: source.address,
-//         url:  source.hosts.index
-//     }
-
-// }).filter(userSub => userSub.address !== currentUserAddress)
-// }
-
-
-
+ 
 
 
 
@@ -93,17 +73,19 @@ const getSubscribed = async ({ userAddress = '' }) => {
         const currentUserData = usersData.find(data => data.address === userAddress);
         subscribedList = currentUserData.subscribed;
     } else {
+        
+        
+        console.warn('usersData', usersData);
+        
         subscribedList = generateSubscribed({ usersList: usersData });
 
     }
-    return subscribedList;
+    return usersData;
 };
 
 
 
-
-
-const updateUserConfig = async ({ currentUserData }) => {
+const updateUserConfig = async ({ userSource }) => {
     let usersData = [], subscribedList;
     try {
         const usersConfigJson = await getObject({
@@ -116,9 +98,9 @@ const updateUserConfig = async ({ currentUserData }) => {
     }
 
     if (!Array.isArray(usersData) || usersData === []) {
-        usersData = [currentUserData];
+        usersData = [userSource];
 
-    } usersData.push(currentUserData)
+    } usersData.push(userSource)
 
     return usersData;
 }
@@ -127,15 +109,15 @@ const updateUserConfig = async ({ currentUserData }) => {
 const addNewUserToConfig = async ({ source }) => {
     let subscribed;
 
-    const currentUserData = {
-        address: source.address,
-        source: source,
-        url: `${config.publicApiHost}/${source.address}`,
-    };
+    // const currentUserSource = {
+    //     address: source.address,
+    //     source: source,
+    //     url: `${config.publicApiHost}/${source.address}`,
+    // };
 
 
     try {
-        subscribed = await updateUserConfig({ currentUserData });
+        subscribed = await updateUserConfig({ userSource: source });
         console.log('newConfig[updateUserConfig]', subscribed);
     } catch (e) {
         console.warn("[_utils][subscribed][addNewUserToConfig]", e);

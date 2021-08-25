@@ -25,21 +25,12 @@ module.exports.getEphemeralKeys = async ({ event }) => {
         return response;
     }
 
-    try {
-        user = await getUserByLogin({ tableName: config.userTableName, login: userName });
 
+    try {
+        user = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, userRelation: prefixes.user });
         if (!user) {
             return response;
         }
-    } catch (e) {
-        console.warn("[login--1]", e);
-        return response;
-    }
-
-    //   new DATA Base Model
-    try {
-        user_NonRelational = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
-
     } catch (e) {
         console.warn("[getEphemeralKeys][getUserByLogin_NonRelational]", e);
         return response;
@@ -59,28 +50,7 @@ module.exports.getEphemeralKeys = async ({ event }) => {
     }
 
     try {
-        await updateEphemeralSecret({
-            tableName: config.userTableName,
-            address: user?.address,
-            serverEphemeralSecret: serverEphemeralSecret,
-        });
-
-        if (!loginDataSecondStep) {
-            return response;
-        }
-
-        response = {
-            statusCode: 200,
-            body: stringify(loginDataSecondStep)
-        }
-    } catch (e) {
-        console.warn("[login--3]", e);
-        return response;
-    }
-
-    try {
- 
-        await updateEphemeralSecret_NonRelational({
+       await updateEphemeralSecret_NonRelational({
             tableName: config.signedTableName,
             userName: userName,
             serverEphemeralSecret: serverEphemeralSecret,

@@ -4,12 +4,7 @@ const { config } = require("../../../../config");
 const { putObjectS3 } = require("../../../../lib/s3");
 const { getFoldersName } = require("../../_utils");
  
-// const getFoldersName = (hash) => {
-//     return {
-//         first: hash.slice(0, 2),
-//         second: hash.slice(2, 4),
-//     };
-// };
+ 
 
 exports.putFile = async ({ post }) => {
     let res, postString;

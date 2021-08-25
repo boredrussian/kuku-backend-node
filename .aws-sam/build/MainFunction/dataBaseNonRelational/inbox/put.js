@@ -7,28 +7,63 @@ AWS.config.update({
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-
-module.exports.putMentionData = async ({
+module.exports.putInboxPost_NonRelational = async ({
     tableName,
-    address,
-    id,
-    post,
-    status
-}) => {
+    mentionedUserAddress,
+    authorPostAddress,
+    postId,
+    postJson,
+    status,
+    sourceRelation,
+    inboxPostRelation,
+    createdAt
+   }) => {
+    
+    const userMentonedAddress = `${sourceRelation}-${mentionedUserAddress}`;
+    const destinationAddressId = `${inboxPostRelation}-${authorPostAddress}-${postId}`;
     
     try {
         const params = {
             TableName: tableName,
             Item: {
-                address: address,
-                id: id,
-                post: post,
+                PK: userMentonedAddress,
+                SK: destinationAddressId,
+                postJson,
                 status,
+                createdAt 
             },
         };
         await dynamoDb.put(params).promise();
     }
 
+    catch (e) {
+        console.warn("[dataBase][inbox][put][putData]", e);
+    }
+
+};
+
+
+module.exports.putInboxMentionAuthor_NonRelational = async ({
+    tableName,
+    authorPostAddress,
+    postId,
+    sourceRelation,
+    inboxPostRelation,
+    }) => {
+    
+    const destinationAddressId = `${inboxPostRelation}-${authorPostAddress}-${postId}`;
+    const authorAddress = `${sourceRelation}-${authorPostAddress}`;
+    
+    try {
+        const params = {
+            TableName: tableName,
+            Item: {
+                PK: destinationAddressId,
+                SK: authorAddress,
+        },
+        };
+        await dynamoDb.put(params).promise();
+    }
     catch (e) {
         console.warn("[dataBase][inbox][put][putData]", e);
     }

@@ -4,33 +4,39 @@ const stringify = require("fast-json-stable-stringify");
 const parseJson = require("parse-json");
 
 
-
 AWS.config.update({
   region: config.region,
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
  
- 
- module.exports.updateStatus = async ({
+ module.exports.updateInboxItem_NonRelation = async ({
     tableName,
     address,
     id,
-    status
+    newStatus,
+    authorAddress,
+    destinationAddress,
+    sourceRelation,
+    inboxPostRelation
 }) => {
+    
+    const pkSourceAddress = `${sourceRelation}-${destinationAddress}`;
+    const skDestinationId = `${inboxPostRelation}-${authorAddress}-${id}`;
+    
     const params = {
         TableName: tableName,
         Key: {
-            address: address,
-            id: id
+            PK: pkSourceAddress,
+            SK: skDestinationId
         },
-     UpdateExpression: "set #st = :newStatus",
-        ExpressionAttributeValues: {
-            ":newStatus": status,
-        },
+     UpdateExpression: "set #status = :newStatus",
         ExpressionAttributeNames: {
-       "#st": "status",
+       "#status": "status",
     },
+        ExpressionAttributeValues: {
+            ":newStatus": newStatus,
+        },
         ReturnValues: "ALL_NEW",
     };
 

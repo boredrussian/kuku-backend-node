@@ -18,9 +18,9 @@ exports.prefixes = {
     user: 'user',
     subscribed: 'subscribed',
     source: 'source',
-    inboxpost: 'public/config.json',
-    
-};
+    inboxPost: 'inboxpost',
+    tag: 'tag',
+    };
 
 exports.httpApi = {
     savePost: {

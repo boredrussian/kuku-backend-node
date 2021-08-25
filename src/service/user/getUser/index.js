@@ -23,13 +23,7 @@ module.exports.getUser = async ({ event }) => {
 
     try {
         user = await getUserByAccessToken({ tableName: config.userTableName, token });
-         try {
-                // subscribed = await getSubscribed({userAddress: user?.address});
-                console.log('subscribed-1---------111-111-111' , user)
-        
-            } catch (e) {
-        console.warn("[getUser][getSubscribed]", e);
-    }
+  
         if (user) {
             const data = {
                 address: user?.address,

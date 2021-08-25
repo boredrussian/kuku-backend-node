@@ -1,18 +1,14 @@
 
 const { config, prefixes } = require('../../../../config');
-const { getIndex } = require('../../../../dataBase/index/get');
-const { updateIndexDb } = require('../../../../dataBase/post/update');
-
 const { getIndex_NonRelational } = require('../../../../dataBaseNonRelational/index/get');
 const { updateIndexDb_NonRelational } = require('../../../../dataBaseNonRelational/index/update');
 
-exports.updateIndex = async ({ post }) => {
-  let currentIndex, currentIndex_NonRelational;
+exports.updateIndex = async ({ post, indexAddress }) => {
+  let currentIndex_NonRelational;
 
   try {
-    currentIndex_NonRelational = await getIndex_NonRelational({ tableName: config.signedTableName, address: post.source.address, source_relation: prefixes.source });
-    console.log('currentIndex_NonRelational', currentIndex_NonRelational);
-  } catch (e) {
+    currentIndex_NonRelational = await getIndex_NonRelational({ tableName: config.signedTableName, address: indexAddress, sourceRelation: prefixes.source });
+    } catch (e) {
     console.warn("[updateIndex][currentIndex_NonRelational]", e);
   }
 
@@ -20,7 +16,9 @@ exports.updateIndex = async ({ post }) => {
     await updateIndexDb_NonRelational({
       tableName: config.signedTableName,
       currentIndex: currentIndex_NonRelational,
-      receivedPost: post, source_relation: prefixes.source
+      receivedPost: post,
+      address: indexAddress, 
+      sourceRelation: prefixes.source
     });
   }
   catch (e) {
@@ -28,19 +26,6 @@ exports.updateIndex = async ({ post }) => {
   }
 
 
-  try {
-    currentIndex = await getIndex({ tableName: config.indexTableName, address: post.source.address });
-
-  } catch (e) {
-    console.warn("[updateIndex][getIndex]", e);
-  }
-
-
-  try {
-    await updateIndexDb({ tableName: config.indexTableName, currentIndex, receivedPost: post });
-  }
-  catch (e) {
-    console.warn('[updateIndex][updateIndexDb]', e);
-  }
-
 };
+
+

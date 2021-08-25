@@ -2,7 +2,6 @@
 const { getUserByLogin } = require('../../../../dataBase/user/get');
 const { updateServerSessionProof } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/server');
-// const parseJson = require("parse-json");
 const stringify = require('fast-json-stable-stringify');
 const { config, prefixes } = require('../../../../config');
 const { bodyEncrypted } = require('../../../../lib/crypto');
@@ -24,17 +23,12 @@ module.exports.getSessionProofs = async ({ event }) => {
         console.warn('[getSessionProofs][bodyEncrypted]', e);
     }
 
+ 
     try {
-        user = await getUserByLogin({ tableName: config.userTableName, login: userName });
-    } catch (e) {
-        console.warn('[sessionProof][getUserByLogin]', e);
-    }
-
-    try {
-        user_NonRelational = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
-        // if (!user_NonRelational) {
-        //     return response;
-        // }
+        user = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, userRelation: prefixes.user });
+        if (!user) {
+            return response;
+        }
     } catch (e) {
         console.warn("[getEphemeralKeys][getUserByLogin_NonRelational]", e);
         return response;
@@ -53,17 +47,12 @@ module.exports.getSessionProofs = async ({ event }) => {
                 clientSessionProof
             );
 
-            await updateServerSessionProof({
-                tableName: config.userTableName,
-                address: user.address,
-                serverSessionProof: serverSession.proof,
-            });
-
+   
             await updateServerSessionProof_NonRelational({
                 tableName: config.signedTableName,
                 userName: userName,
                 serverSessionProof: serverSession.proof,
-                user_relation: prefixes.user
+                userRelation: prefixes.user
             });
 
             response = {

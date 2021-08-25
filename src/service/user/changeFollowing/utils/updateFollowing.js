@@ -4,7 +4,7 @@ const { putObjectS3 } = require("../../../../lib/s3");
 const { getUserByAddress } = require('../../../../dataBase/user/get');
 const { getUserNameByAddress_NonRelational, getUserByUserName_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
 const { updateSubscribe } = require('../../../../dataBase/user/update');
-const { setUserSubscribed_NonReleational } = require("../../../../dataBaseNonRelational/user/put");
+const { setUserSubscribed_NonRelational } = require("../../../../dataBaseNonRelational/user/put");
 const { remoweSubscribed_NonRelational } = require("../../../../dataBaseNonRelational/user/delete");
 
 exports.updateFollowing = async ({ address, followSource, follow }) => {
@@ -63,7 +63,6 @@ exports.updateFollowing = async ({ address, followSource, follow }) => {
         console.warn("[getUserLogin][getUserByLogin_NonRelational]", e);
     }
 
-
     if (follow) {
         try {
             await setUserSubscribed_NonRelational({
@@ -77,8 +76,7 @@ exports.updateFollowing = async ({ address, followSource, follow }) => {
             console.warn('[register][setUserSubscribed]', e);
         }
     } else {
-        console.log(' await remoweSubscribed_NonRelational({')
-        await remoweSubscribed_NonRelational({
+           await remoweSubscribed_NonRelational({
             tableName: config.signedTableName,
             currentUserName: userName_NonRelational,
             subscribedAddress: address,

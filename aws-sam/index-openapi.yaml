@@ -1,56 +1,57 @@
 openapi: 3.0.2
 info:
-  title:
-    signed.移动 Public Index API
-  description:
-    Lambdaless fetching of source indexes from DynamoDB
+  title: signed.移动 Public Index API
+  description: Lambdaless fetching of source indexes from DynamoDB
   version: 1.0.0
 paths:
   /{address}:
     get:
       consumes:
-        - 'application/json'
+        - "application/json"
       produces:
-        - 'application/json'
+        - "application/json"
       parameters:
-        - name: 'address'
-          in: 'path'
+        - name: "address"
+          in: "path"
           required: true
           schema:
             type: string
       responses:
         200:
-          $ref: '#/components/responses/Index'
+          $ref: "#/components/responses/Index"
       x-amazon-apigateway-integration:
-        description: Retrieve a specific index from the database 
-        credentials:  { 'Fn::GetAtt': PublicAPIRole.Arn }
-        uri: { 'Fn::Sub': 'arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query' }
+        description: Retrieve a specific index from the database
+        credentials: { "Fn::GetAtt": PublicAPIRole.Arn }
+        uri:
+          {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Query",
+          }
         requestTemplates:
           application/json:
-            Fn::Sub: 
+            Fn::Sub:
               - |-
                 { 
                   "TableName": "${tableName}",
-                  "PrimaryKey": "address", 
-                  "KeyConditionExpression": "address = :v1",
+                  "PrimaryKey": "PK", 
+                  "KeyConditionExpression": "PK = :v1 and SK = :v1",
                   "ExpressionAttributeValues": {
                       ":v1": {
-                          "S": "$input.params("address").replaceAll(".json", "")"
+                          "S": "source-$input.params("address").replaceAll(".json", "")"
                       }
                   }
                 }
-              - { tableName: { Ref: IndexTable } }
+              - { tableName: "signed" }
         responses:
           default:
             statusCode: "200"
             responseTemplates:
               application/json: '#set($inputRoot = $input.path("$"))
-                                #if($inputRoot.Count == 0)
-                                #set($context.responseOverride.status = 404)
-                                {"error": "Address not found"}
-                                #else
-                                $input.path("Items[0].index.S")
-                                #end'
+                #if($inputRoot.Count == 0)
+                #set($context.responseOverride.status = 404)
+                {"error": "Address not found"}
+                #else
+                {"source":$input.path("Items[0].sourceJson.S"),"index":$input.path("Items[0].indexJson.S")}
+                #end'
         passthroughBehavior: "when_no_match"
         httpMethod: POST
         type: AWS
@@ -66,4 +67,3 @@ components:
         application/json:
           schema:
             type: string
-        

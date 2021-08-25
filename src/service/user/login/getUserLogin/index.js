@@ -11,11 +11,13 @@ const { bodyEncrypted } = require('../../../../lib/crypto');
 const { getUserByUserName_NonRelational, getSubscribed_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
 const { getIndex_NonRelational } = require('../../../../dataBaseNonRelational/index/get');
 const { updateAccessToken_NonRelational } = require('../../../../dataBaseNonRelational/user/update');
+const { remoweUser_NonRelational } = require('../../../../dataBaseNonRelational/user/delete');
+const { deleteAllItems } = require('../../../../dataBaseNonRelational/signed/delete');
 
 
 module.exports.getUserLogin = async ({ event }) => {
   // TODO add validation
-  let user, userName, serverSessionProof, subscribed, user_NonRelational, subscribedUser_NonRelational;
+  let user, userName, serverSessionProof, subscribed, user_NonRelational, subscribedUser_NonRelational, userIndex;
 
   let response = {
     'statusCode': 404,
@@ -28,45 +30,45 @@ module.exports.getUserLogin = async ({ event }) => {
     console.warn('[getUserLogin][bodyEncrypted]', e);
   }
 
-  try {
-    user = await getUserByLogin({ tableName: config.userTableName, login: userName });
-
-  } catch (e) {
-    console.warn("[getUserLogin][getUserByLogin]", e);
-    return response;
+ 
+  
+  
+  try{
+    // user = await remoweUser_NonRelational({ tableName: config.signedTableName, currentUserName: 'vbvb', userRelation: prefixes.user });
+    // user = await deleteAllItems({ tableName: config.signedTableName});
+     console.warn('[delete][delete]' );
+  }catch(e){
+    console.warn('[getUserLogin][deleteAllItems]', e);
   }
 
   try {
-    user_NonRelational = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, user_relation: prefixes.user });
-
+    user  = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName: userName, userRelation: prefixes.user });
+    console.warn('user getUserByUserName_NonRelational', user);
   } catch (e) {
     console.warn("[getUserLogin][getUserByLogin_NonRelational]", e);
   }
-
-  // try {
-  //   subscribed = await getSubscribed({userAddress: user?.address} );
-  // } catch (e) {
-  //   console.warn("[getUser][getSubscribed]", e);
-  // }
-
+  
   try {
+    userIndex  = await getIndex_NonRelational({ tableName: config.signedTableName, address: user.address, sourceRelation: prefixes.source });
+    console.warn('user getIndex_NonRelational', userIndex);
+  } catch (e) {
+    console.warn("[getUserLogin][getIndex_NonRelational]", e);
+  }
+
+ 
     if (user?.serverSessionProof !== serverSessionProof) {
       return response;
     }
     const accessToken = makeToken({ type: "access" });
 
-    await updateAccessToken({
-      tableName: config.userTableName,
-      address: user?.address,
-      accessToken: accessToken,
-    });
+  
 
     try {
       await updateAccessToken_NonRelational({
         tableName: config.signedTableName,
         userName: userName,
         accessToken: accessToken,
-        user_relation: prefixes.user
+        userRelation: prefixes.user
       });
     } catch (e) {
       console.warn("[getUserLogin][updateAccessToken_NonRelational]", e);
@@ -77,13 +79,14 @@ module.exports.getUserLogin = async ({ event }) => {
       subscribedUser_NonRelational = await getSubscribed_NonRelational({
         tableName: config.signedTableName,
         userName: userName,
-        user_relation: prefixes.user,
-        subscribed_relation: prefixes.subscribed,
+        userRelation: prefixes.user,
+        subscribedRelation: prefixes.subscribed,
       });
     }
-    catch (e) { console.warn("[getSubscribed_NonRelational]", e); }
+ catch (e) { console.warn("[getSubscribed_NonRelational]", e); }
 
-    const resSubscribed = await Promise.allSettled(
+ try{
+      const resSubscribed = await Promise.allSettled(
       subscribedUser_NonRelational.map(async (user) => {
         const address = user.SK.slice(`${prefixes.subscribed}-`.length);
         try {
@@ -91,37 +94,42 @@ module.exports.getUserLogin = async ({ event }) => {
             {
               tableName: config.signedTableName,
               address: address,
-              source_relation: prefixes.source
+              sourceRelation: prefixes.source
             });
 
         } catch (e) {
-          console.warn('[register][setUserSubscribed]', e);
+          console.warn('[getUSerLogin][setUserSubscribed]', e);
         }
       })
     );
-
-    //  add to response !!!!
-    const getSubscribedSource_NonRelational = resSubscribed.map(data => data.value.sourceJson)
-
+    try{
+    subscribed = resSubscribed.map(data => parseJson(data.value.sourceJson));
+    }
+    catch(e){
+      console.warn('[getUSerLogin][getIndex_NonRelational][gather subscribed source]', e);
+      subscribed = []
+    }
+    
+    
     const data = {
       login: user?.login,
       address: user?.address,
       wif: user?.encryptedWif,
       token: accessToken,
-      subscribed: user?.subscribed,
-      source: user?.source
+      subscribed: subscribed,
+      source: userIndex.sourceJson
     };
-
 
     response = {
       statusCode: 200,
       body: stringify(data)
     }
+ }
+ 
+ catch (e){
+   console.warn('[getUSerLogin][getIndex_NonRelational - combine][sendData]', e);
+ }
 
-    return response
-  } catch (e) {
-    console.warn("[getUserLogin]", e);
-    return response
-  }
+  return response
 };
 
