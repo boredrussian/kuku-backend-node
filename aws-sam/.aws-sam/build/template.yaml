@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: "signed.\u79FB\u52A8 node at AWS"
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+Resources:
+  PublicAPIRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: PublicAPIPolicy
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:Query
+            Resource: arn:aws:dynamodb:us-west-2:164620743841:table/signed
+  IndexApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowMethods: '''POST, GET'''
+        AllowHeaders: '''X-Forwarded-For'''
+        AllowOrigin: '''*'''
+      OpenApiVersion: 3.0.2
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ..\..\index-openapi.yaml
+  TagApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowMethods: '''POST, GET'''
+        AllowHeaders: '''X-Forwarded-For'''
+        AllowOrigin: '''*'''
+      OpenApiVersion: 3.0.2
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ..\..\tag-openapi.yaml
+Outputs:
+  IndexUrl:
+    Description: Public Index URL
+    Value:
+      Fn::Sub: https://${IndexApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+  TagUrl:
+    Description: Public Tag URL
+    Value:
+      Fn::Sub: https://${TagApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}

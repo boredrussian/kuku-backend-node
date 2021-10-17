@@ -39,9 +39,9 @@ module.exports.updateServerSessionProof_NonRelational = async ({
     tableName,
     userName,
     serverSessionProof,
-    user_relation
+    userRelation
 }) => {
-    const userNameField = `${user_relation}-${userName}`;
+    const userNameField = `${userRelation}-${userName}`;
     const params = {
         TableName: tableName,
         Key: {
@@ -63,11 +63,11 @@ module.exports.updateServerSessionProof_NonRelational = async ({
 module.exports.updateAccessToken_NonRelational = async ({
     tableName,
     userName,
-    user_relation,
+    userRelation,
     accessToken,
 }) => {
 
-    const userNameField = `${user_relation}-${userName}`;
+    const userNameField = `${userRelation}-${userName}`;
     const params = {
         TableName: tableName,
         Key: {

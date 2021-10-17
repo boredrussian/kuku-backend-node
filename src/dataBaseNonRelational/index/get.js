@@ -12,10 +12,10 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.getIndex_NonRelational = async ({
     tableName,
     address,
-    source_relation
+    sourceRelation
 }) => {
     let userData;
-    const pk = `${source_relation}-${address}`;
+    const pk = `${sourceRelation}-${address}`;
 
     const params = {
         TableName: tableName,
@@ -26,7 +26,7 @@ module.exports.getIndex_NonRelational = async ({
         },
         ExpressionAttributeValues: {
             ':pkData': pk,
-            ':source_relation': source_relation,
+            ':source_relation': sourceRelation,
         }
     };
 

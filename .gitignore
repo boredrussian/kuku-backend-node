@@ -107,3 +107,7 @@ dist
 
 # AwsConfig Secure! 
 src/awsSeruceConfig
+
+
+# Sam deploy files
+# .aws-sam/

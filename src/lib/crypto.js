@@ -25,10 +25,7 @@ const bodyEncrypted = ({ event }) => {
         const encodedWord = CryptoJS.enc.Base64.parse(event.body);
         const encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
         body = parseJson(encoded);
-        
-        
-        console.log('body', body)
-    }
+       }
     catch (e) {
         console.warn('[lib][][eventBodyEncrypted]', e);
     }
@@ -39,19 +36,37 @@ const checkIsObjectValid =  ({ objData, address }) => {
     const { signatures } = objData;
     const message = getJsonFromObj({ objectData: objData });
     
-    let isValid;
-    console.log('message---1', message)
-    console.log('address---1', address)
-    console.log('signatures---1', signatures)
-    try {
-        isValid =  isSignaturesValid({
-        message, address, signatures
-        })
-    } catch (e) {
+    let isValidArr = [], isValid;
+    
+    if(!Array.isArray(signatures)){
         console.warn('[]')
     }
-
-    return isValid;
+    
+    
+    try {
+      const isValidArr = signatures.map(sign => {
+        return isSignaturesValid({
+        message, address: sign.address, signature: sign.signature
+        })
+     })
+     } catch (e) {
+        console.warn('[crypto][isSignaturesValid]',e)
+    } 
+    
+    if(isValidArr.find(val => val === 'false')){
+        isValid = false;
+    } else {
+        isValid = true;
+        }
+    
+    //   try {
+    //     isValid =  isSignaturesValid({
+    //     message, address, signatures
+    //     })
+    // } catch (e) {
+    //     console.warn('[crypto][isSignaturesValid]',e)
+    // } 
+   return isValid;
 };
 
 

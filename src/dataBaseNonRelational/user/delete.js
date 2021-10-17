@@ -27,3 +27,21 @@ module.exports.remoweSubscribed_NonRelational = async ({
     return await dynamoDb.delete(params).promise();
 };
 
+
+module.exports.remoweUser_NonRelational = async ({
+    tableName,
+    currentUserName,
+    userRelation,
+}) => {
+    const userNameFieldRelational = `${userRelation}-${currentUserName}`;
+    const params = {
+        TableName: tableName,
+        Key: {
+            PK: userNameFieldRelational,
+            SK: userNameFieldRelational,
+        }
+    };
+
+    return await dynamoDb.delete(params).promise();
+};
+

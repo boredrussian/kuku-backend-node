@@ -3,20 +3,23 @@
 const { makeToken } = require("../../../lib/jwt");
 const { config, prefixes } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
-const { addUser } = require("../../../dataBase/user/put");
-const { getUsers } = require("../../../dataBase/user/get");
-
-const { putFirstIndexData } = require("../../../dataBase/index/put");
-
-// new non Relational DB model 
+const parseJson = require("parse-json");
 const { getUsers_NonRelational } = require("../../../dataBaseNonRelational/user/get");
 const { addUser_NonRelational, addUserSourceReletion_NonRelational, putSourceAndIndexInitial_NonRelational, setUserSubscribed_NonRelational }
     = require("../../../dataBaseNonRelational/user/put");
-// -------------------------------------------------------//
 
-const { updateUsersSubscribed } = require("../../../dataBase/user/update");
 const { addNewUserToConfig, generateSubscribed, getUserSourcesArr } = require("../_utils/subscribed");
 const { bodyEncrypted } = require('../../../lib/crypto');
+
+
+
+
+const getSubscribed = (userList) => {
+    if(!Array.isArray(userList)){
+        return [];
+    }
+  return userList.map(user => parseJson(user.sourceJson));
+}
 
 
 const register = async ({ event }) => {
@@ -39,8 +42,16 @@ const register = async ({ event }) => {
     }
 
     try {
-        usersSubscribedList_NonRelational = await getUsers_NonRelational({ tableName: config.signedTableName, source_relation: prefixes.source });
-
+        usersSubscribedList_NonRelational = await getUsers_NonRelational({ tableName: config.signedTableName, sourceRelation: prefixes.source });
+        
+      if(!usersSubscribedList_NonRelational || !Array.isArray(usersSubscribedList_NonRelational)  ){
+         usersSubscribedList_NonRelational = [];
+       }
+    
+    console.warn('usersSubscribedList_NonRelational234', usersSubscribedList_NonRelational);
+    
+    subscribed = getSubscribed(usersSubscribedList_NonRelational);
+    console.warn('subscribed', subscribed);
     } catch (e) {
         console.warn("[register][usersList_NonRelational]", e);
     }
@@ -48,7 +59,6 @@ const register = async ({ event }) => {
     const resSetSubscribed = await Promise.allSettled(
         usersSubscribedList_NonRelational.map(async (user) => {
             const address = user.PK.slice(`${prefixes.source}-`.length);
-            console.log('address', address);
             try {
                 await setUserSubscribed_NonRelational({
                     tableName: config.signedTableName,
@@ -102,6 +112,17 @@ const register = async ({ event }) => {
             address,
             login: userName,
         });
+        
+        
+        const resData = {
+            accessToken,
+            subscribed,
+        };
+
+        response = {
+            'statusCode': 200,
+            'body': stringify(resData)
+        };
     }
     catch (e) {
         console.warn("[register][addUserSourceReletion_NonRelational]", e);
@@ -116,50 +137,50 @@ const register = async ({ event }) => {
 
 
 
-    try {
-        usersList = await getUsers({ tableName: config.userTableName });
-        subscribed = generateSubscribed({ usersList });
-    } catch (e) {
-        console.warn("[register][updateUserConfig]", e);
-    }
+    // try {
+    //     usersList = await getUsers({ tableName: config.userTableName });
+    //     subscribed = generateSubscribed({ usersList });
+    // } catch (e) {
+    //     console.warn("[register][updateUserConfig]", e);
+    // }
 
-    try {
-        await putFirstIndexData({
-            tableName: config.indexTableName,
-            address: address,
-            firstData: { posts: [], source: source }
-        });
-    }
-    catch (e) {
-        console.warn('[updateIndex][putFirstData]', e);
-    }
+    // try {
+    //     await putFirstIndexData({
+    //         tableName: config.indexTableName,
+    //         address: address,
+    //         firstData: { posts: [], source: source }
+    //     });
+    // }
+    // catch (e) {
+    //     console.warn('[updateIndex][putFirstData]', e);
+    // }
 
-    try {
-        await addUser({
-            tableName: config.userTableName,
-            address,
-            encryptedWif,
-            salt,
-            verifier,
-            login: userName,
-            accessToken,
-            subscribed,
-            source: stringify(source)
-        });
+    // try {
+    //     await addUser({
+    //         tableName: config.userTableName,
+    //         address,
+    //         encryptedWif,
+    //         salt,
+    //         verifier,
+    //         login: userName,
+    //         accessToken,
+    //         subscribed,
+    //         source: stringify(source)
+    //     });
 
-        const resData = {
-            accessToken,
-            subscribed,
-        };
+    //     const resData = {
+    //         accessToken,
+    //         subscribed,
+    //     };
 
-        response = {
-            'statusCode': 200,
-            'body': stringify(resData)
-        };
-    }
-    catch (e) {
-        console.warn("[register][addUser]", e);
-    }
+    //     response = {
+    //         'statusCode': 200,
+    //         'body': stringify(resData)
+    //     };
+    // }
+    // catch (e) {
+    //     console.warn("[register][addUser]", e);
+    // }
 
     return response;
 };

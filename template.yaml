@@ -34,11 +34,6 @@ Resources:
           Properties:
             Method: post
             Path: /post
-        GetIndex:
-          Type: HttpApi
-          Properties:
-            Method: get
-            Path: /book
         Register:
           Type: HttpApi
           Properties:

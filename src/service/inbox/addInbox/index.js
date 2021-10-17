@@ -1,15 +1,15 @@
 
 const parseJson = require("parse-json");
-const { config } = require("../../../config");
+const { config, prefixes } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
-const { putMentionData } = require("../../../dataBase/inbox/put");
-const { getInboxBAddressCrossingId } = require("../../../dataBase/inbox/get");
-const { getUserByAddress } = require("../../../dataBase/user/get");
+const { putInboxPost_NonRelational, putInboxMentionAuthor_NonRelational } = require("../../../dataBaseNonRelational/inbox/put");
+
+const { getUserNameByAddress_NonRelational, getUserByUserName_NonRelational } = require('../../../dataBaseNonRelational/user/get');
+
 
 //  Status new/rejected/accepted
 
 const { bodyEncrypted } = require('../../../lib/crypto');
-
 
 const isUserExistInBlackList = ({userBlackList, mentionedUserAddress }) => {
     if(!!userBlackList) {return false};
@@ -19,13 +19,12 @@ const isUserExistInBlackList = ({userBlackList, mentionedUserAddress }) => {
     if(userBlackList.includes(mentionedUserAddress)){
         isExistInBlackList = true;
     }
-    
     return isExistInBlackList;
 }
 
 
 const addInbox = async ({ event }) => {
-    let mentionedUserAddress, post, mention, mentonedUser, isUserInBlackList;
+    let mentionedUserAddress, post, mention, mentonedUser, isUserInBlackList, userName_NonRelational, user_NonRelational;
     
     let response = {
         'statusCode': 403,
@@ -33,65 +32,80 @@ const addInbox = async ({ event }) => {
     };
     try {
         ({ mentionedUserAddress, post} = bodyEncrypted({ event }));
-        console.log('mentionedUserAddress', mentionedUserAddress);
-        console.log('post', post);
-        console.log('event', event);
     } catch (e) {
         console.warn('[register][bodyEncrypted]', e);
     }
  
-     try {
-    mention =  await getData({ tableName: config.inboxTableName, address: mentionedUserAddress, id: post.id});
-   console.log('1111111111111111111')
-   
-    } catch (e) {
-        console.warn("[addInbox][putData]", e);
-    }
-    
-    
-    
-    
     try {
-        
-    mentonedUser = await getUserByAddress({ tableName: config.userTableName, address: mentionedUserAddress });
-    console.log('mentonedUser', mentonedUser);
-    
-   const blackList = mentonedUser.blackList ? parseJson(mentonedUser.blackList) : '';
-   console.log('blackList', blackList);
-    
-      isUserInBlackList = isUserExistInBlackList({userBlackList : blackList , mentionedUserAddress });
-   console.log('isUserInBlackList', isUserInBlackList);
-    
-      } catch (e) {
-        console.warn("[addInbox][putData]", e);
+        userName_NonRelational = await getUserNameByAddress_NonRelational({
+            tableName: config.signedTableName,
+            address: mentionedUserAddress,
+            sourceRelation: prefixes.source,
+            userRelation: prefixes.user
+        });
+        userName_NonRelational = userName_NonRelational.slice(`${prefixes.user}-`.length);
     }
-     console.log('mention', mention);
-    if(mention || isUserInBlackList){
+    catch (e) {
+        console.warn('[addInbox][getUserNameByAddress_NonRelational]', e);
+    }
+
+    try {
+        user_NonRelational = await getUserByUserName_NonRelational({
+            tableName: config.signedTableName,
+            userName: userName_NonRelational,
+            user_relation: prefixes.user });
+            
+        const blackList = mentonedUser.blackList ? parseJson(mentonedUser.blackList) : '';
+        isUserInBlackList = isUserExistInBlackList({userBlackList : blackList , mentionedUserAddress }); 
+            
+    } catch (e) {
+        console.warn("[getUserLogin][getUserByLogin_NonRelational]", e);
+    }
+ 
+        
+ 
+    
+    
+  if(mention || isUserInBlackList){
         console.warn("[mentoned!!!!!!!! exist!!!]");
         return response; }
    
  try {
-     const postJson = stringify(post);
-     console.log('mentionedUserAddress---1', mentionedUserAddress);
-     console.log('post---1', post);
-     console.log('postJson---1', postJson);
-    await putMentionData({ tableName: config.inboxTableName, address: mentionedUserAddress, id: post.id, post: postJson, status: 'new' });
+    const postJson = stringify(post);
+ 
+    await putInboxPost_NonRelational({
+    tableName: config.signedTableName,
+    mentionedUserAddress,
+    authorPostAddress:  post.source.address,
+    postId: post.id,
+    postJson,
+    status: 'new',
+    sourceRelation : prefixes.source,
+    inboxPostRelation : prefixes.inboxPost,
+    createdAt: Date.now()
+    });
+  } catch (e) {
+        console.warn("[addInbox][putData]", e);
+  } 
+  
+ try {
+    await putInboxMentionAuthor_NonRelational({
+    tableName: config.signedTableName,
+    authorPostAddress:  post.source.address,
+    postId: post.id,
+    sourceRelation : prefixes.source,
+    inboxPostRelation : prefixes.inboxPost,
+    });
     response = {
         'statusCode': 200,
         'body': `Ok`
     };
- } catch (e) {
+  } catch (e) {
         console.warn("[addInbox][putData]", e);
   } 
  
     
-  
- 
-
-   
-
-
-    return response;
+return response;
 };
 
 module.exports = {

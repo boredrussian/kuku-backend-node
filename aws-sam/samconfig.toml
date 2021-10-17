@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "public-signed-app"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-wunkb93bga0a"
+s3_prefix = "signed-app"
+region = "us-west-2"
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+parameter_overrides = "Stage=\"prod\""
+ 

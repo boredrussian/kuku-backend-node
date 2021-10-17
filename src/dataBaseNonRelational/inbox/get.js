@@ -11,7 +11,8 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.getInboxByAddressCrossingId = async ({
     tableName,
     address,
-    id
+    id,
+    
 }) => {
     let index;
     const params = {
@@ -30,20 +31,26 @@ module.exports.getInboxByAddressCrossingId = async ({
     return index;
 };
 
-module.exports.getInboxesByAddress = async ({
+
+module.exports.getInbox_NonRelational = async ({
     tableName,
     address,
-    status
+    sourceRelation,
+    inboxPostRelation,
 }) => {
     let index;
+    
+    const userAddressData = `${sourceRelation}-${address}`;
     const params = {
       TableName: tableName,
-      KeyConditionExpression: "#address = :address",
+      KeyConditionExpression: "#PK = :userAddressData and begins_with(#SK, :inboxPostRelation)",
       ExpressionAttributeNames: {
-            "#address": "address",
+            "#PK": "PK",
+            "#SK": "SK",
     },
     ExpressionAttributeValues: {
-           ":address": address
+           ":userAddressData": userAddressData,
+           ":inboxPostRelation": inboxPostRelation,
             }
     }
     const res = await dynamoDb.query(params).promise();
@@ -55,7 +62,48 @@ module.exports.getInboxesByAddress = async ({
 };
 
 
- 
+
+module.exports.getInboxItem = async ({
+    tableName,
+    id,
+    address,
+    authorAddress,
+    destinationAddress,
+    sourceRelation,
+    inboxPostRelation,
+}) => {
+    let index;
+    
+   const pkSourceAddress = `${sourceRelation}-${destinationAddress}`;
+   const skDestinationId = `${inboxPostRelation}-${authorAddress}-${id}`;
+    
+    const params = {
+        TableName: tableName,
+        Key: {
+            PK: pkSourceAddress,
+            SK: skDestinationId
+        }}
+     
+        
+    // const params = {
+    //   TableName: tableName,
+    //   KeyConditionExpression: "#PK = :userAddressData and begins_with(#SK, :inboxPostRelation)",
+    //   ExpressionAttributeNames: {
+    //         "#PK": "PK",
+    //         "#SK": "SK",
+    // },
+    // ExpressionAttributeValues: {
+    //       ":userAddressData": userAddressData,
+    //       ":inboxPostRelation": inboxPostRelation,
+    //         }
+    // }
+    const res = await dynamoDb.get(params).promise();
+
+    if (res.Item) {
+        index = res.Item;
+    }
+    return index;
+};
 
 
 
