@@ -1,28 +1,25 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  singed
-  Sample SAM Template for singed
+  A Node.JS backend for Signed node
+  Deploys
+  - Lambda function with all handlers
+  - HTTP API GW
+  - SQS FIFO queue
+  - DynamoDB table 
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 60
-  Api:
-    Cors:
-      AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'content-type'"
-      AllowOrigin: "'*'"
-      AllowCredentials: "'*'"
+    Timeout: 30 # Makes no sense to have a higher timeout as HTTP GW timeout is max 30 seconds
 
 Resources:
   MainFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: /app.lambdaHandler
       Runtime: nodejs14.x
-      Role: arn:aws:iam::164620743841:role/lambda-execution-role # Pre-existing role
+      Role: arn:aws:iam::164620743841:role/lambda-execution-role # TODO: This is a pre-existing role, need to find a better way
       Environment:
         Variables:
           TEST_2: Value345
@@ -32,79 +29,119 @@ Resources:
         SavePost:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /post
         Register:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /register
         CheckLogin:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /register/checkLogin
         ExchangeEphemeralKeysFirstStepLogin:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /login/exchangeEphemeralKeys
         ValidateSessionProofsSecondStepLogin:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /login/validateSessionProofs
         GetUserTokenThirdLoginStepLogin:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /login/getUserToken
         GetUser:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /user
         userUpdate:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /user/update
         GetSubscribed:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: get
             Path: /subscribed
         UploadFile:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /file/upload
         UserFollow:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /user/follow
         SetInbox:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /inbox
         GetInbox:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: get
             Path: /inbox
         UpdateInbox:
           Type: HttpApi
           Properties:
+            ApiId: !Ref HttpApi
             Method: post
             Path: /inbox/update
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FifoQueue.Arn
+            BatchSize: 10
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        MaxAge: 600
+        AllowCredentials: false
+
+  FifoQueue:
+      Type: AWS::SQS::Queue
+      Properties: 
+        FifoQueue: true
+        QueueName: Signed.fifo
+        VisibilityTimeout: 120 # Should be above the Lambda timeout
 
   DepLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: singed-app-dependencies
-      Description: Dependencies for  singed-app
+      Description: NPM dependencies for the Singed node
       ContentUri: dependencies/
       CompatibleRuntimes:
         - nodejs14.x
@@ -112,9 +149,6 @@ Resources:
       RetentionPolicy: Retain
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  SignedApi:
+    Description: "API Gateway endpoint URL for Prod stage for Signed node"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"

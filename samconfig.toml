@@ -3,8 +3,9 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "signed-app"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-wunkb93bga0a"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-qqe5d1m7nsag"
 s3_prefix = "signed-app"
-region = "us-west-2"
+region = "eu-west-1"
 capabilities = "CAPABILITY_IAM"
+image_repositories = []
  
