@@ -110,4 +110,7 @@ src/awsSeruceConfig
 
 
 # Sam deploy files
-# .aws-sam/
+.aws-sam/
+
+# VSCode settings
+.vscode
