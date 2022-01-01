@@ -15,7 +15,7 @@ The 'signed' table is defined as:
 Here is the list of all used combinations of PK/SK
 - all-sources / [address] - sourceJSON
 - post-[address] / [createdAt] - postJSON, replies, likes, reposts
-- hash-[hash] / [createdAt]-[address] - type, size, myme-type, username, uploadedAt
+- hash-[hash] / [createdAt]-[address] - type, size, mime-type, username, uploadedAt
 - tag-[tag-name-base64] / [createdAt]-[address] 
 - reply-to-[post-hash] / [createdAt]-[address] - replies to a particular post version
 - like-[post-hash] / [createdAt]-[address] - likes of a particular post version
