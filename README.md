@@ -13,8 +13,11 @@ The 'signed' table is defined as:
 - sort key: SK string
 
 Here is the list of all used combinations of PK/SK
-- all-sources / source-[address] 
-  - indexJSON
+- all-sources / [address] - sourceJSON
+- post-[address] / [createdAt] - postJSON
+- tag-[tag-name-base64] / [createdAt]-[address] 
+- all-users / [username]
+- inbox-[address] / [createdAt]
 
 
 ### Users
