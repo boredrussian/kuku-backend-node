@@ -16,6 +16,7 @@ Here is the list of all used combinations of PK/SK
 - all-sources / [address] - sourceJSON
 - post-[address] / [createdAt] - postJSON
 - tag-[tag-name-base64] / [createdAt]-[address] 
+- reply-[post-hash] / [createdAt]-[address]
 - all-users / [username]
 - inbox-[address] / [createdAt]
 
