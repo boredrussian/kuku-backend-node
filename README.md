@@ -15,14 +15,41 @@ The 'signed' table is defined as:
 Here is the list of all used combinations of PK/SK
 - all-sources / [address] - sourceJSON
 - post-[address] / [createdAt] - postJSON, replies, likes, reposts
-- hash-[hash] / [createdAt]-[address] - type, size, extension, username, uploadedAt
+- hash-[hash] / [createdAt]-[address] - type, size, myme-type, username, uploadedAt
 - tag-[tag-name-base64] / [createdAt]-[address] 
 - reply-to-[post-hash] / [createdAt]-[address] - replies to a particular post version
-- like-to-[post-hash] / [createdAt]-[address] - likes of a particular post version
+- like-[post-hash] / [createdAt]-[address] - likes of a particular post version
 - repost-[post-hash] / [createdAt]-[address] - reposts of a particular post version
 - all-users / [username]
 - inbox-[address] / [createdAt]
 
+## Internal DB API
+- putItem(PK, SK)
+- getItem(PK, SK)
+- getItems(PK, fromSK, toSK)
+  - implements paging internally 
+- delete([PK, SK]) - deletes in batches of 25
 
-### Users
-###
+## Internal S3 asset store API
+- putItem(content, address, createdAt, type, mime-type, username) returns hash
+
+# Public API
+
+- getPosts for a particular timestamp range (createdAt)
+  - of several source addresses 
+   - combine results of getItems(post-address, fromSK, toSK) 
+  - OR with a particular tag
+   - combine results of getItems(tag-name, fromSK, toSK)
+  - OR replies to a specific post hash
+   - combine results of getItems(reply-to-hash, fromSK, toSK)
+- getSources by a list of addresses
+- getDefaultSources
+
+# Inbox API
+- addPost(post, source)
+
+# Private API
+- addPost (post, source)
+- uploadAsset
+- registerUser
+- login flow
