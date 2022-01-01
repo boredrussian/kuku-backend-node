@@ -9,11 +9,11 @@ const { config } = require('../config');
  */
 
 const expiredTimeMap = {
-    access: 86400,
+    access: 86400 * 30,
     refresh: 86400 * 30,
 };
 
-module.exports.makeToken = ({ type }) => {
+const makeToken = ({ type }) => {
     let jwtToken = "";
     try {
         jwtToken = jwt.sign({ type: type }, config.jwtSecret, {
@@ -25,16 +25,48 @@ module.exports.makeToken = ({ type }) => {
     return jwtToken;
 };
 
-module.exports.verifyToken = ({ token }) => {
+
+
+     
+   
+
+const verifyToken = ({ token }) => {
     let isVerify = false;
 
     try {
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, config.jwtSecret);
         if (decodedToken) {
             isVerify = true;
         }
     } catch (err) {
-        console.log("[verifyToken]", err);
+        console.log("[lib][jwt][verifyToken][token is invalid]", err);
     }
     return isVerify;
 };
+
+
+const isAccessValid = ({event}) => {
+  
+      
+   const { headers: {authorization}} = event;
+  
+  
+  
+    if(!authorization.startsWith('Bearer ')){
+        return false;
+    }
+
+    const token = authorization.replace("Bearer ", "");
+    
+    
+    return verifyToken({ token }) 
+      
+     }
+     
+     
+     
+     module.exports = {
+         verifyToken, 
+         isAccessValid,
+         makeToken
+     }

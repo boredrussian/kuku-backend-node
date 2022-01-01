@@ -37,10 +37,11 @@ module.exports.getInbox_NonRelational = async ({
     address,
     sourceRelation,
     inboxPostRelation,
+    inboxRelation
 }) => {
     let index;
     
-    const userAddressData = `${sourceRelation}-${address}`;
+    const userAddressData = `${sourceRelation}-${inboxRelation}-${address}`;
     const params = {
       TableName: tableName,
       KeyConditionExpression: "#PK = :userAddressData and begins_with(#SK, :inboxPostRelation)",
@@ -70,11 +71,12 @@ module.exports.getInboxItem = async ({
     authorAddress,
     destinationAddress,
     sourceRelation,
+    inboxRelation,
     inboxPostRelation,
 }) => {
     let index;
     
-   const pkSourceAddress = `${sourceRelation}-${destinationAddress}`;
+   const pkSourceAddress = `${sourceRelation}-${inboxRelation}-${destinationAddress}`;
    const skDestinationId = `${inboxPostRelation}-${authorAddress}-${id}`;
     
     const params = {

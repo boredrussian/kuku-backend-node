@@ -1,36 +1,35 @@
 
 const stringify = require('fast-json-stable-stringify');
-const { getUserByAccessToken } = require('../../../dataBase/user/get');
-const { config } = require('../../../config');
+
+const { config, prefixes } = require('../../../config');
 const { getSubscribed } = require("../_utils/subscribed");
 const { bodyEncrypted } = require('../../../lib/crypto');
+const { getUserByUserName_NonRelational } = require('../../../dataBaseNonRelational/user/get');
 
 module.exports.getUser = async ({ event }) => {
     // TODO add validation
-    let token, user, subscribed;
+    let token, user, subscribed, userName;
 
     let response = {
         'statusCode': 404,
-        'body': 'Login or password is invalid'
+        'body': 'Could not find user ' + user
     };
 
     try {
-        ({ token } = bodyEncrypted({ event }));
+        ({ userName } = bodyEncrypted({ event }));
     } catch (e) {
         console.warn('[getUser][bodyEncrypted]', e);
     }
-
+    console.log('userName', userName)
 
     try {
-        user = await getUserByAccessToken({ tableName: config.userTableName, token });
-  
+        user = await getUserByUserName_NonRelational({ tableName: config.signedTableName, userName : userName, userRelation: prefixes.user  });
+        console.warn('[getUser][bodyEncrypted]', user);
         if (user) {
             const data = {
-                address: user?.address,
-                userName: user?.login,
-                subscribed: user?.subscribed,
-                source: user?.source,
-            };
+              userName: user?.login,
+              encryptedWif: user?.encryptedWif,
+              };
 
             response = {
                 statusCode: 200,

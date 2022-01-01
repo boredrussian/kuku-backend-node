@@ -48,12 +48,12 @@ const deleteItem = ({tableName, pk, sk}) => {
 };
 
 
-
 // exports.deleteAllItems = async function (event, context, callback) {
 exports.deleteAllItems = async function ({tableName  }) {
   try {
     // const tableName = "<table>";
     // scan and get all items
+    console.log('[deleteAllItems]delete All items', tableName);
     const allRecords = await getAllRecords(tableName);
     // delete one by one 
     for (const item of allRecords) {

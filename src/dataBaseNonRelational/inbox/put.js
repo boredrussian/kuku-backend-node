@@ -15,14 +15,15 @@ module.exports.putInboxPost_NonRelational = async ({
     postJson,
     status,
     sourceRelation,
+    inboxRelation,
     inboxPostRelation,
     createdAt
    }) => {
     
-    const userMentonedAddress = `${sourceRelation}-${mentionedUserAddress}`;
+    const userMentonedAddress = `${sourceRelation}-${inboxRelation}-${mentionedUserAddress}`;
     const destinationAddressId = `${inboxPostRelation}-${authorPostAddress}-${postId}`;
     
-    try {
+     try {
         const params = {
             TableName: tableName,
             Item: {
@@ -72,19 +73,3 @@ module.exports.putInboxMentionAuthor_NonRelational = async ({
 
 
 
-
-// const dynamodbParams = {
-//     TableName: process.env.DYNAMODB_TABLE_BLICKANALYTICS,
-//     Item: {
-//         id: userId,
-//         createdAt: timestamp
-//     },
-//     ConditionExpression: 'attribute_not_exists(id)'
-// };
-// dynamodb.putItem(params, function(err, data) {
-//     if (err) {
-//         console.log(err, err.stack);
-//     } else {
-//         console.log(data);
-//     }
-// }

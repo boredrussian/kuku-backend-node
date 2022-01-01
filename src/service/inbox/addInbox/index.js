@@ -3,13 +3,14 @@ const parseJson = require("parse-json");
 const { config, prefixes } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
 const { putInboxPost_NonRelational, putInboxMentionAuthor_NonRelational } = require("../../../dataBaseNonRelational/inbox/put");
+const { bodyEncrypted } = require('../../../lib/crypto');
+const { isAccessValid } = require('../../../lib/jwt');
 
 const { getUserNameByAddress_NonRelational, getUserByUserName_NonRelational } = require('../../../dataBaseNonRelational/user/get');
 
 
-//  Status new/rejected/accepted
+// inbox statuses new/rejected/accepted
 
-const { bodyEncrypted } = require('../../../lib/crypto');
 
 const isUserExistInBlackList = ({userBlackList, mentionedUserAddress }) => {
     if(!!userBlackList) {return false};
@@ -30,10 +31,17 @@ const addInbox = async ({ event }) => {
         'statusCode': 403,
         'body': `Error was occurred [inbox service] [addInbox]`
     };
+    
+    
+    if(!isAccessValid({event})){
+    return response;
+    }
+    
     try {
         ({ mentionedUserAddress, post} = bodyEncrypted({ event }));
     } catch (e) {
         console.warn('[register][bodyEncrypted]', e);
+        return response;
     }
  
     try {
@@ -81,6 +89,7 @@ const addInbox = async ({ event }) => {
     postJson,
     status: 'new',
     sourceRelation : prefixes.source,
+    inboxRelation : prefixes.inbox,
     inboxPostRelation : prefixes.inboxPost,
     createdAt: Date.now()
     });

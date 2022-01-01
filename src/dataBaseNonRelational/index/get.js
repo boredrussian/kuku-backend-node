@@ -2,34 +2,34 @@ const AWS = require("aws-sdk");
 const { config } = require('../../config');
 
 
-
 AWS.config.update({
     region: config.region,
 });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-
+//     KeyConditionExpression: '#PK = :pkData and begins_with(#SK, :source_relation)',
 module.exports.getIndex_NonRelational = async ({
     tableName,
     address,
-    sourceRelation
+    sourceRelation,
+    allSourcesReletion
 }) => {
     let userData;
-    const pk = `${sourceRelation}-${address}`;
+    const sk = `${sourceRelation}-${address}`;
 
     const params = {
         TableName: tableName,
-        KeyConditionExpression: '#PK = :pkData and begins_with(#SK, :source_relation)',
+        KeyConditionExpression: '#PK = :pkData and #SK = :skData',
         ExpressionAttributeNames: {
             "#SK": "SK",
             "#PK": "PK",
         },
         ExpressionAttributeValues: {
-            ':pkData': pk,
-            ':source_relation': sourceRelation,
+            ':pkData': allSourcesReletion,
+            ':skData': sk,
         }
     };
-
+    console.log(params);
 
     const userResData = await dynamoDb.query(params).promise();
 

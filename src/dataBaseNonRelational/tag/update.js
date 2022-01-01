@@ -23,7 +23,6 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
  
   currentTagIndex.push(post)
   
- 
   
     const params = {
         TableName: tableName,

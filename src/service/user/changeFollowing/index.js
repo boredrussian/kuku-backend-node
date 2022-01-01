@@ -4,6 +4,7 @@ const { updateFollowing } = require('./utils/updateFollowing');
 const { config } = require('../../../config');
 const { getSubscribed } = require("../_utils/subscribed");
 const { bodyEncrypted } = require('../../../lib/crypto');
+const { isAccessValid } = require('../../../lib/jwt');
 
 module.exports.changeFollowing = async ({ event }) => {
     let address, followSource, follow;
@@ -13,12 +14,16 @@ module.exports.changeFollowing = async ({ event }) => {
         'body': 'Error occured try to following'
     };
 
+if(!isAccessValid({event})){
+    return response;
+}
+
     try {
         ({ address, followSource, follow } = bodyEncrypted({ event }));
      }
     catch (e) {
         console.warn('[getUser][bodyEncrypted]', e);
-        return response;
+       
     }
  
     try {
@@ -28,8 +33,8 @@ module.exports.changeFollowing = async ({ event }) => {
         'body': 'Ok'
     };
     } catch (e) {
-        console.warn('[getUser][bodyEncrypted]', e);
-          return response;
+        console.warn('[getUser][updateFollowing]', e);
+        return response;
     }
   
    

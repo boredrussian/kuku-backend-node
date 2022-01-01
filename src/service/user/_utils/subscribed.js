@@ -30,25 +30,20 @@ const generateSubscribed = ({ usersList }) => {
         return [];
     }
 
+    console.warn('[subscribed][generateSubscribed][usersList - signature]', usersList);
     const newUsers = usersList.map(user => {
+        
         return {
             address: user.address,
             source: user.source,
             url: `${config.publicApiHost}/${user.address}`
         }
     });
-
     return newUsers;
 }
 
 
  
-
-
-
-
-
-
 
 
 
@@ -68,18 +63,13 @@ const getSubscribed = async ({ userAddress = '' }) => {
     if (!Array.isArray(usersData)) {
         return [];
     }
-
+    
     if (userAddress) {
+      
         const currentUserData = usersData.find(data => data.address === userAddress);
         subscribedList = currentUserData.subscribed;
-    } else {
-        
-        
-        console.warn('usersData', usersData);
-        
-        subscribedList = generateSubscribed({ usersList: usersData });
-
-    }
+    } 
+    
     return usersData;
 };
 
@@ -175,11 +165,17 @@ const updateUserSourceInConfig = async ({ source }) => {
 };
 
 
+const getSubscribedFromIndex = (userList) => {
+    if(!Array.isArray(userList)){
+        return [];
+    }
+  return userList.map(user => parseJson(user.sourceJson));
+}
 
 
 
 module.exports = {
     getSubscribed, addNewUserToConfig,
     getAddresses, generateSubscribed,
-    getUserSourcesArr, updateUserSourceInConfig,
+    getUserSourcesArr, updateUserSourceInConfig, getSubscribedFromIndex
 };

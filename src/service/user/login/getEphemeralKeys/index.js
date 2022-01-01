@@ -1,10 +1,8 @@
 
-const { getUserByLogin } = require('../../../../dataBase/user/get');
-const { updateEphemeralSecret } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/server');
 const { getUserByUserName_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
 const { updateEphemeralSecret_NonRelational } = require('../../../../dataBaseNonRelational/user/update');
-
+const { deleteAllItems } = require('../../../../dataBaseNonRelational/signed/delete');
 const stringify = require('fast-json-stable-stringify');
 const { config, prefixes } = require('../../../../config');
 const { bodyEncrypted } = require('../../../../lib/crypto');
@@ -15,6 +13,17 @@ module.exports.getEphemeralKeys = async ({ event }) => {
         'statusCode': 404,
         'body': 'Login or password is invalid'
     };
+
+
+
+// !!!this method delete all items in data base!!!
+// try{
+//      user = await deleteAllItems({ tableName: config.signedTableName});
+// }catch(e){
+//     console.warn("[deleteAllItems][deleteAllItems]", e);
+// }
+
+ 
 
     try {
         ({ userName } = bodyEncrypted({ event }));

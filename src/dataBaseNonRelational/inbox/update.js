@@ -18,10 +18,11 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
     authorAddress,
     destinationAddress,
     sourceRelation,
-    inboxPostRelation
+    inboxPostRelation,
+    inboxRelation
 }) => {
     
-    const pkSourceAddress = `${sourceRelation}-${destinationAddress}`;
+    const pkSourceAddress = `${sourceRelation}-${inboxRelation}-${destinationAddress}`;
     const skDestinationId = `${inboxPostRelation}-${authorAddress}-${id}`;
     
     const params = {

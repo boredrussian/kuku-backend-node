@@ -15,7 +15,8 @@ module.exports.updateIndexSource_NonRelational = async ({
   tableName,
   sourceRelation,
   currentIndex,
-  newSource
+  newSource,
+  allSourcesReletion
 }) => {
   let newIndexJson, newIndex;
 
@@ -23,12 +24,12 @@ module.exports.updateIndexSource_NonRelational = async ({
   const newSourceJson = stringify(newSource);
 
 
-  const pkValue = `${sourceRelation}-${newSource.address}`;
+  const skValue = `${sourceRelation}-${newSource.address}`;
   const params = {
     TableName: tableName,
     Key: {
-      PK: pkValue,
-      SK: pkValue
+      PK: allSourcesReletion,
+      SK: skValue
     },
 
     UpdateExpression: "SET #sourceJson = :newSourceJson, #version = :version",
@@ -45,11 +46,12 @@ module.exports.updateIndexSource_NonRelational = async ({
     ReturnValues: "ALL_NEW",
   };
 
-
-  console.warn('params', params)
-
-
-  await dynamoDb.update(params).promise();
+try {
+ await dynamoDb.update(params).promise();
+}catch(e){
+   console.warn('[updateIndexSource_NonRelational]', newIndexJson);
+}
+ 
 };
 
 
@@ -59,33 +61,38 @@ module.exports.updateIndexDb_NonRelational = async ({
   currentIndex,
   address,
   receivedPost,
-  sourceRelation
+  sourceRelation,
+  allSourcesReletion
 }) => {
-  let newIndexJson, postArray;
+  let newIndexJson, postArray, recentPostArray, indexObject;
 
   const currentVersion = currentIndex?.version;
   const indexJson = currentIndex?.indexJson;
 
+ 
+
   try {
-    postArray = parseJson(indexJson);
-    if (Array.isArray(postArray)) {
-      postArray.push(receivedPost);
+    indexObject = parseJson(indexJson);
+    recentPostArray = indexObject.recentPosts;
+    
+    if (Array.isArray(recentPostArray)) {
+      recentPostArray.push(receivedPost);
     }
 
-    newIndexJson = stringify(postArray);
-    
-    console.warn('newIndexJson', newIndexJson);
-    
+    indexObject.recentPosts = recentPostArray;
+    newIndexJson = stringify(indexObject);
+ 
   } catch (e) {
     console.warn("[updateIndexDb_NonRelational]", e);
   }
 
-  const pkValue = `${sourceRelation}-${address}`;
+  const skValue = `${sourceRelation}-${address}`;
+ 
   const params = {
     TableName: tableName,
     Key: {
-      PK: pkValue,
-      SK: pkValue
+      PK: allSourcesReletion,
+      SK: skValue
     },
 
     UpdateExpression: "SET #indexJson = :newIndexJson, #version = :version",
@@ -102,5 +109,73 @@ module.exports.updateIndexDb_NonRelational = async ({
     ReturnValues: "ALL_NEW",
   };
 
+  try {
+  const res = await dynamoDb.update(params).promise();
+  
+  return true;
+  
+  }catch(e){
+   console.warn("[updateIndexDb_NonRelational][dynamoDb.update]", e);
+   
+   return false;
+   
+  }
+
+ 
+ 
+};
+
+
+      // tableName: config.signedTableName,
+      // address: indexAddress,
+      // indexObject,
+      // currentIndex,
+      // sourceRelation: prefixes.source,
+      // allSourcesReletion: prefixes.allSources
+
+module.exports.updateIndexArchive = async ({
+  tableName,
+  currentIndex,
+  address,
+  indexObject,
+  sourceRelation,
+  allSourcesReletion
+}) => {
+ const currentVersion = currentIndex?.version;
+ const newIndexJson = stringify(indexObject);
+  
+ const skValue = `${sourceRelation}-${address}`;
+ 
+ const params = {
+    TableName: tableName,
+    Key: {
+      PK: allSourcesReletion,
+      SK: skValue
+ },
+
+    UpdateExpression: "SET #indexJson = :newIndexJson, #version = :version",
+    ConditionExpression: "#version = :expectedVersion",
+    ExpressionAttributeNames: {
+      "#indexJson": "indexJson",
+      "#version": "version",
+    },
+    ExpressionAttributeValues: {
+      ":newIndexJson": newIndexJson,
+      ":version": currentVersion + 1,
+      ":expectedVersion": currentVersion,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  try {
   await dynamoDb.update(params).promise();
+  return true;
+  }
+  catch(e){
+   console.warn("[updateIndexDb_NonRelational][dynamoDb.update]", e);
+   return false;
+  }
+
+ 
+ 
 };

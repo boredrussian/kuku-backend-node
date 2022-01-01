@@ -148,6 +148,34 @@ Resources:
       LicenseInfo: "MIT"
       RetentionPolicy: Retain
 
+  SignedTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions: 
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TableName: signed.sam # TODO parametrize the name
+      KeySchema: 
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes: 
+        - IndexName: Inverted-GSI
+          KeySchema: 
+          - AttributeName: SK
+            KeyType: HASH
+          - AttributeName: PK
+            KeyType: RANGE
+          Projection: 
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput: 
+            ReadCapacityUnits: 0
+            WriteCapacityUnits: 0
+
 Outputs:
   SignedApi:
     Description: "API Gateway endpoint URL for Prod stage for Signed node"

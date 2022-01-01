@@ -4,33 +4,25 @@ const { config } = require("../../../../config");
 const { putObjectS3 } = require("../../../../lib/s3");
 const { getFoldersName } = require("../../_utils");
  
- 
 
-exports.putFile = async ({ post }) => {
-    let res, postString;
-    if (!post?.hash) {
-        console.warn('hash is absent');
-        return;
-    }
-    const hash = post.hash;
+
+exports.putFile = async ({ data, hash }) => {
+    
     const folders = getFoldersName(hash);
-    const saveToPath = `${config.savePostFile}/${folders.first}/${folders.second}/${folders.fileName}.json`;
+    const saveToPath = `${config.fileStorage}/${folders.first}/${folders.second}/${folders.fileName}.json`;
   
-    try {
-        postString = stringify(post);
-    } catch (e) {
-        console.warn('postString', postString);
-    }
-
-    try {
-        await putObjectS3({
+ try {
+            await putObjectS3({
             bucket: config.bucket,
             key: saveToPath,
-            data: postString,
+            data: stringify(data),
             type: "application/json",
         });
-    } catch (e) {
+        
+        console.log('folders', folders);
+        console.log('saveToPath', saveToPath);
+ } catch (e) {
         console.warn("putObject-error", e);
     }
-    return res
+    
 };

@@ -1,6 +1,4 @@
 
-const { getUserByLogin } = require('../../../../dataBase/user/get');
-const { updateServerSessionProof } = require('../../../../dataBase/user/update');
 const srp = require('secure-remote-password/server');
 const stringify = require('fast-json-stable-stringify');
 const { config, prefixes } = require('../../../../config');

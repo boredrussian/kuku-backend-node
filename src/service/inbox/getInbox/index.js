@@ -3,10 +3,8 @@ const queryString = require('query-string');
 const { config, prefixes } = require("../../../config");
 const stringify = require('fast-json-stable-stringify');
 const { getInbox_NonRelational } = require("../../../dataBaseNonRelational/inbox/get");
-const { getData } = require("../../../dataBase/inbox/get");
-const { getUserByAddress } = require("../../../dataBase/user/get");
-const { bodyEncrypted } = require('../../../lib/crypto');
-
+const { bodyEncrypted  } = require('../../../lib/crypto');
+const { isAccessValid } = require('../../../lib/jwt');
 
 const mentionsStatusFilter = ({arr, status}) => {
     if(!Array.isArray(arr)) {
@@ -21,13 +19,19 @@ const getInbox = async ({ event }) => {
         'body': `Error was occurred [inbox service] [getInbox]`
     };
     
+   
+    
+//     if(!isAccessValid({event})){
+//     return response;
+// }
     const parsedHash = queryString.parse(event.rawQueryString);
     const address = parsedHash.address;
    try {
    const mentions_NonRelational =  await getInbox_NonRelational({ tableName: config.signedTableName,
    address: address,
    inboxPostRelation: prefixes.inboxPost,
-   sourceRelation: prefixes.source
+   inboxRelation: prefixes.inbox,
+   sourceRelation: prefixes.source,
    });
     
     response = {

@@ -7,19 +7,16 @@ const stringify = require('fast-json-stable-stringify');
 const parseJson = require("parse-json");
 
 
-exports.updateTagIndex = async ({ post }) => {
-if(!Array.isArray(post.tags)){
+exports.updateTagIndex = async ({ post, tags }) => {
+if(!Array.isArray(tags)){
     return 
 }
 let currentIndex, currentTagsArr, preparedTagsArr;
-// const tagArr = ['jjj', 'fdafsdf'];
-
-const tagArr = post.tags;
-let tagSet = [...tagArr];
+let tagSet = [...tags];
 
 try{
       currentTagsArr = await Promise.allSettled(
-        tagArr.map(async (tag) => {
+        tags.map(async (tag) => {
           return  await getTagIndex({
                     tableName: config.signedTableName,
                     tag: tag,

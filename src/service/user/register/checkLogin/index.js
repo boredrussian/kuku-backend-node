@@ -1,5 +1,4 @@
 const stringify = require('fast-json-stable-stringify');
-
 const { getUserByUserName_NonRelational } = require('../../../../dataBaseNonRelational/user/get');
 const { config, prefixes } = require("../../../../config");
 const { bodyEncrypted } = require('../../../../lib/crypto');

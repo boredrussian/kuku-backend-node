@@ -7,11 +7,8 @@ const stringify = require('fast-json-stable-stringify');
 const { getInboxItem } = require("../../../dataBaseNonRelational/inbox/get");
 const { updateInboxItem_NonRelation } = require("../../../dataBaseNonRelational/inbox/update");
 const { savePost } = require("../../post/savePost");
-
- 
-
-//  new/rejected/accepted
-const { bodyEncrypted } = require('../../../lib/crypto');
+const { isAccessValid } = require('../../../lib/jwt');
+const { bodyEncrypted  } = require('../../../lib/crypto');
 
 
 const updateInbox = async ({ event }) => {
@@ -21,14 +18,20 @@ const updateInbox = async ({ event }) => {
         'statusCode': 403,
         'body': `Error was occurred [inbox service] [updateInbox]`
     };
+    
+    
+    // if(!isAccessValid({event})){
+    //     return response;
+    // }
+        
     try {
-        ({id, status, destinationAddress, authorAddress } = bodyEncrypted({ event }));
-         } catch (e) {
+        ({id, status, destinationAddress, authorAddress, post } = bodyEncrypted({ event }));
+         }
+        catch (e) {
         console.warn('[updateInbox][bodyEncrypted]', e);
         return response;
     }
     
- 
     try {
     await updateInboxItem_NonRelation({
         tableName: config.signedTableName,
@@ -37,43 +40,46 @@ const updateInbox = async ({ event }) => {
         destinationAddress,
         newStatus: status,
         inboxPostRelation: prefixes.inboxPost,
-        sourceRelation: prefixes.source
+        sourceRelation: prefixes.source,
+        inboxRelation: prefixes.inbox,
         });
      } catch (e) {
         console.warn("[updateInbox][updateInboxItem_NonRelation]", e);
-        return response;
+        // return response;
     }
     
     if(status === 'accepted'){
        
-     try{
-    const {postJson} = await getInboxItem({
-        tableName: config.signedTableName,
-        id: id,
-        authorAddress,
-        destinationAddress,
-        inboxPostRelation: prefixes.inboxPost,
-        sourceRelation: prefixes.source
-    });
+    //  try{
+    // const {postJson} = await getInboxItem({
+    //     tableName: config.signedTableName,
+    //     id: id,
+    //     authorAddress,
+    //     destinationAddress,
+    //     inboxPostRelation: prefixes.inboxPost,
+    //     sourceRelation: prefixes.source,
+    //     inboxRelation: prefixes.inbox
+    // });
     
-    post = parseJson(postJson);
+    // post = parseJson(postJson);
     
     
-    console.warn("[inboxItem][inboxItem]", postJson);
+ 
     
-    response = {
-        'statusCode': 200,
-        'body':  'Ok'
-    };
+    // response = {
+    //     'statusCode': 200,
+    //     'body':  'Ok'
+    // };
     
-    }catch(e){
-     console.warn("[updateInbox][getInboxItem]", e);
-     return response;
-    }
+    // }catch(e){
+    //  console.warn("[updateInbox][getInboxItem]", e);
+    //  return response;
+    // }
     
   try {
+      
   response = await savePost({event, isAddToIndex: true, inboxPost: post, inboxAddress: destinationAddress });
-   response = {
+  response = {
         'statusCode': 200,
         'body':  'Ok'
   };

@@ -41,8 +41,7 @@ const getObject = async ({ bucket, key }) => {
             Bucket: bucket,
             Key: key
         };
-        console.log('params--- getObject', params);
-        const data = await s3.getObject(params).promise();
+             const data = await s3.getObject(params).promise();
         return data.Body.toString('utf-8');
     } catch (e) {
         console.warn("[lib][s3][getObject]", e);

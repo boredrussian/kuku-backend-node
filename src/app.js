@@ -11,22 +11,31 @@ const { getSubscribed } = require('./service/user/getSubscribed');
 const { changeFollowing } = require('./service/user/changeFollowing');
 const { addInbox, getInbox, updateInbox } = require('./service/inbox');
  
- 
-
-
 const { httpApi } = require('./config');
 
 exports.lambdaHandler = async (event, context) => {
+    if ('Records' in event) { // SQS batch
+        event.Records.forEach(record => {
+            const { body } = record;
+            console.log(body);
+        });
+        return {};
+    }
+ 
+    
     let response;
     const { method, path } = event.requestContext.http;
     const notFoundResponse = {
         'statusCode': 404,
     };
 
+
+
     console.log('path---', path);
     console.log('method---', method);
+    console.log('event---', event);
 
-if(method === 'POST'){
+   if(method === 'POST'){
    switch (path) {
         case httpApi.savePost.path:
             response = await savePost({ event });

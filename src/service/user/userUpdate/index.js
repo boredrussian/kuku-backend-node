@@ -1,12 +1,9 @@
 
 const stringify = require('fast-json-stable-stringify');
-const { getUserByAccessToken } = require('../../../dataBase/user/get');
-const { updateUser } = require('../../../dataBase/user/update');
 const { config, prefixes } = require('../../../config');
 const { getSubscribed, updateUserSourceInConfig } = require("../_utils/subscribed");
 const { bodyEncrypted, checkIsObjectValid } = require('../../../lib/crypto');
-const { getIndex } = require('../../../dataBase/index/get');
-const { updateIndexUserSource } = require('../../../dataBase/index/update');
+const { isAccessValid} = require('../../../lib/jwt');
 const { updateIndexSource_NonRelational } = require('../../../dataBaseNonRelational/index/update');
 const { getIndex_NonRelational } = require('../../../dataBaseNonRelational/index/get');
 
@@ -18,6 +15,11 @@ module.exports.userUpdate = async ({ event }) => {
     'body': 'Error occurred when try to update user data, source signature or hash is wrong!'
   };
 
+
+  if(!isAccessValid({event})){
+        return response;
+    }
+
   try {
     ({ source } = bodyEncrypted({ event }));
   } catch (e) {
@@ -26,8 +28,7 @@ module.exports.userUpdate = async ({ event }) => {
 
   try {
     isValid = checkIsObjectValid({ objData: source, address: source.address });
- 
-  } catch (e) {
+   } catch (e) {
     console.warn('[userUpdate][checkIsObjectValid]', e)
     isValid = false;
     return;
@@ -37,13 +38,21 @@ module.exports.userUpdate = async ({ event }) => {
 
 
   try {
-    currentIndex_NonRelational = await getIndex_NonRelational({ tableName: config.signedTableName, address: source.address, sourceRelation: prefixes.source });
+    currentIndex_NonRelational = await getIndex_NonRelational({
+      tableName: config.signedTableName,
+      address: source.address,
+      sourceRelation: prefixes.source,
+      allSourcesReletion: prefixes.allSources});
     } catch (e) {
     console.warn("[updateIndex][currentIndex_NonRelational]", e);
   }
 
   try {
-  await updateIndexSource_NonRelational({ tableName: config.signedTableName, currentIndex: currentIndex_NonRelational, newSource: source, sourceRelation: prefixes.source });
+  await updateIndexSource_NonRelational({ tableName: config.signedTableName,
+  currentIndex: currentIndex_NonRelational,
+  newSource: source,
+  sourceRelation: prefixes.source,
+  allSourcesReletion: prefixes.allSources});
  
       response = {
       statusCode: 200,

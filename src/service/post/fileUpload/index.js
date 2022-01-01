@@ -1,5 +1,5 @@
 const { config } = require("../../../config");
-const { bodyEncrypted } = require('../../../lib/crypto');
+const { isAccessValid } = require('../../../lib/jwt');
 
 const Busboy = require('busboy');
 const path = require('path');
@@ -37,6 +37,11 @@ const fileUpload =  ({ event }) => {
             'statusCode': 404,
             'body': 'User not found!'
         };
+
+
+  if(!isAccessValid({event})){
+        return response;
+    }
 
         let hashFileName;
         const sha256 = CryptoJS.algo.SHA256.create();
@@ -79,7 +84,7 @@ const fileUpload =  ({ event }) => {
             hashFileName = `${hash_58}.${fileExtension}`;
             
             
-            // const saveToPath = `${config.savePostFile}/${hashFileName}`;
+   
             
             
             
@@ -91,7 +96,7 @@ const fileUpload =  ({ event }) => {
             }
             
              const folders = getFoldersName(hash_58);
-             const saveToPath = `${config.savePostFile}/${folders.first}/${folders.second}/${folders.fileName}.${fileExtension}`;
+             const saveToPath = `${config.fileStorage}/${folders.first}/${folders.second}/${folders.fileName}.${fileExtension}`;
             
              console.log('saveToPath', saveToPath);
             try {

@@ -1,25 +1,16 @@
 
 
+const stringify = require('fast-json-stable-stringify');
+
 const { makeToken } = require("../../../lib/jwt");
 const { config, prefixes } = require("../../../config");
-const stringify = require('fast-json-stable-stringify');
-const parseJson = require("parse-json");
+const { addNewUserToConfig, getSubscribedFromIndex } = require("../_utils/subscribed");
+const { bodyEncrypted } = require('../../../lib/crypto');
+
 const { getUsers_NonRelational } = require("../../../dataBaseNonRelational/user/get");
 const { addUser_NonRelational, addUserSourceReletion_NonRelational, putSourceAndIndexInitial_NonRelational, setUserSubscribed_NonRelational }
     = require("../../../dataBaseNonRelational/user/put");
 
-const { addNewUserToConfig, generateSubscribed, getUserSourcesArr } = require("../_utils/subscribed");
-const { bodyEncrypted } = require('../../../lib/crypto');
-
-
-
-
-const getSubscribed = (userList) => {
-    if(!Array.isArray(userList)){
-        return [];
-    }
-  return userList.map(user => parseJson(user.sourceJson));
-}
 
 
 const register = async ({ event }) => {
@@ -29,36 +20,37 @@ const register = async ({ event }) => {
         'body': `Error was occurred [addUser]`
     };
     try {
-        ({ address, encryptedWif, userName, salt, verifier, source } = bodyEncrypted({ event }));
-    } catch (e) {
+        ({ address, encryptedWif,  userName, salt, verifier, source } = bodyEncrypted({ event }));
+        } catch (e) {
         console.warn('[register][bodyEncrypted]', e);
     }
     const accessToken = makeToken({ type: "access" });
 
     try {
         await addNewUserToConfig({ source });
-    } catch (e) {
+        } catch (e) {
         console.warn("[register][updateUserConfig]", e);
     }
 
     try {
-        usersSubscribedList_NonRelational = await getUsers_NonRelational({ tableName: config.signedTableName, sourceRelation: prefixes.source });
-        
-      if(!usersSubscribedList_NonRelational || !Array.isArray(usersSubscribedList_NonRelational)  ){
+        usersSubscribedList_NonRelational = await getUsers_NonRelational({ tableName: config.signedTableName,
+        sourceRelation: prefixes.source, allSourcesReletion: prefixes.allSources});
+        if(!usersSubscribedList_NonRelational || !Array.isArray(usersSubscribedList_NonRelational)  ){
          usersSubscribedList_NonRelational = [];
        }
     
-    console.warn('usersSubscribedList_NonRelational234', usersSubscribedList_NonRelational);
-    
-    subscribed = getSubscribed(usersSubscribedList_NonRelational);
-    console.warn('subscribed', subscribed);
+    subscribed = getSubscribedFromIndex(usersSubscribedList_NonRelational);
+  
     } catch (e) {
         console.warn("[register][usersList_NonRelational]", e);
     }
 
     const resSetSubscribed = await Promise.allSettled(
         usersSubscribedList_NonRelational.map(async (user) => {
-            const address = user.PK.slice(`${prefixes.source}-`.length);
+            const address = user.SK.slice(`${prefixes.source}-`.length);
+            console.log('address', address);
+            console.log('user.PK',  user.PK);
+            
             try {
                 await setUserSubscribed_NonRelational({
                     tableName: config.signedTableName,
@@ -73,14 +65,19 @@ const register = async ({ event }) => {
         })
     );
 
-    try {
-        const sourceJson = stringify(source);
 
+    try {
+        const initialIndexState = {
+             recentPosts : [],
+             archives : []    
+        }
+        const sourceJson = stringify(source);
         await putSourceAndIndexInitial_NonRelational({
             tableName: config.signedTableName,
             address: address,
-            indexJsonInitial: stringify([]),
+            indexJsonInitial: stringify(initialIndexState),
             sourceJson: sourceJson,
+            allSourcesReletion: prefixes.allSources,
             version: 0
         });
     }
@@ -99,7 +96,6 @@ const register = async ({ event }) => {
             accessToken,
             source: stringify(source)
         });
-
     }
     catch (e) {
         console.warn("[register][addUser_NonRelational]", e);
@@ -107,7 +103,7 @@ const register = async ({ event }) => {
 
 
     try {
-        await addUserSourceReletion_NonRelational({
+                await addUserSourceReletion_NonRelational({
             tableName: config.signedTableName,
             address,
             login: userName,

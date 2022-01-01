@@ -2,14 +2,16 @@ const bitcoinMessage = require("bitcoinjs-message");
 const CryptoJS = require('crypto-js');
 const parseJson = require("parse-json");
 const { getJsonFromObj } = require("./json");
+const bs58 = require('bs58');
 
-
-const isSignaturesValid = ({ message, address, signatures }) => {
+const isSignaturesValid = ({ message, address, signature }) => {
     let isValid;
     try {
-        isValid = bitcoinMessage.verify(message, address, signatures);
+        // console.log('address', address);
+        // console.log('signatures', signatures);
+        isValid = bitcoinMessage.verify(message, address, signature);
     } catch (e) {
-        console.log("[isSignaturesValid]", e);
+        console.log("[crypto][isSignaturesValid]", e);
         isValid = false;
     }
     return isValid;
@@ -21,9 +23,12 @@ const bodyEncrypted = ({ event }) => {
         return;
     }
 
-    try {
+     try {
         const encodedWord = CryptoJS.enc.Base64.parse(event.body);
+        
+         
         const encoded = CryptoJS.enc.Utf8.stringify(encodedWord);
+        console.log(encoded);
         body = parseJson(encoded);
        }
     catch (e) {
@@ -35,9 +40,8 @@ const bodyEncrypted = ({ event }) => {
 const checkIsObjectValid =  ({ objData, address }) => {
     const { signatures } = objData;
     const message = getJsonFromObj({ objectData: objData });
-    
+   
     let isValidArr = [], isValid;
-    
     if(!Array.isArray(signatures)){
         console.warn('[]')
     }
@@ -45,6 +49,7 @@ const checkIsObjectValid =  ({ objData, address }) => {
     
     try {
       const isValidArr = signatures.map(sign => {
+          console.log('[crypto][isValidArr]------sing', sign);
         return isSignaturesValid({
         message, address: sign.address, signature: sign.signature
         })
@@ -70,7 +75,25 @@ const checkIsObjectValid =  ({ objData, address }) => {
 };
 
 
+
+const getHash = ({ objectData }) => {
+    const dataJson = JSON.stringify(objectData);
+    let resHash;
+    try {
+        const hash = CryptoJS.SHA256(dataJson);
+        const hashString = hash.toString(CryptoJS.enc.Hex);
+        const bytes = Buffer.from(hashString, 'hex');
+          resHash = bs58.encode(bytes);
+    } catch (e) {
+        console.error('[getHash]', e);
+    }
+
+    return resHash;
+}
+
+
 module.exports = {
-     bodyEncrypted,
-    checkIsObjectValid
+    bodyEncrypted,
+    checkIsObjectValid,
+    getHash
 }
