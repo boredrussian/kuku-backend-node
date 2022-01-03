@@ -21,10 +21,10 @@ Here is the list of all used combinations of PK/SK
 - like-[post-hash] / [createdAt]-[address] - likes of a particular post version
 - repost-[post-hash] / [createdAt]-[address] - reposts of a particular post version
 - all-users / [username]
-- inbox-[address] / [createdAt]
+- inbox-[address] / [createdAt] - post, source
 
 ## Internal DB API
-- putItem(PK, SK)
+- putItem(Item)
 - getItem(PK, SK)
 - getItems(PK, fromSK, toSK)
   - implements paging internally 
