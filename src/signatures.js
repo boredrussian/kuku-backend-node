@@ -43,7 +43,7 @@ const getStableString = ({ obj }) => {
     return stableString;
 }
 
-exports.getSignature = ({ obj, wif }) => {
+exports.createSignature = ({ obj, wif }) => {
     const stableString = getStableString({ obj });
     const keyPair = bitcoin.ECPair.fromWIF(wif);
     const privateKey = keyPair.privateKey;
