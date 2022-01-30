@@ -47,22 +47,22 @@ module.exports.putPost = async ({ event }) => {
             commentsCount:0
         }
     }
-    existingItem = getItem(Item);
-    if(existingItem and existingItem.post.updatedAt > post.updatedAt) return false;
+    const existingItem = getItem(Item);
+    if(existingItem && existingItem.post.updatedAt > post.updatedAt) return false;
     
     const hash = getHash({obj: post});
     post.hash = hash;
     
     const ddbItem = putItem({Item});
     
-    postJSON = JSON.stringify(post);
-    
+    const postJSON = JSON.stringify(post);
+    const contentType = 'application/json';
     // add post hash to DDB
     Item = {
         PK: 'hash-' + hash,
         SK: 'post-' + createdAt + '-' + address,
         type: 'post',
-        cType: 'application/json',
+        contentType,
         size: postJSON.length,
         uploadedAt: Date.now()
     }

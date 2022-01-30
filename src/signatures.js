@@ -1,5 +1,5 @@
 const stringify = require('fast-json-stable-stringify');
-const sortKeys = require('sort-object-keys')
+const sortKeys = require('sort-keys');
 const { nanoid } = require('nanoid')
 const CryptoJS = require("crypto-js");
 const bs58 = require('bs58')
@@ -48,7 +48,7 @@ exports.createSignature = ({ obj, wif }) => {
     const keyPair = bitcoin.ECPair.fromWIF(wif);
     const privateKey = keyPair.privateKey;
     const signature = bitcoinMessage.sign(stableString, privateKey, keyPair.compressed);
-    return = signature.toString('base64');
+    return signature.toString('base64');
 };
 
 exports.getHash = ({ obj }) => {
@@ -56,7 +56,7 @@ exports.getHash = ({ obj }) => {
     const hash = CryptoJS.SHA256(dataJson);
     const hashString = hash.toString(CryptoJS.enc.Hex);
     const bytes = Buffer.from(hashString, 'hex');
-    return = bs58.encode(bytes);
+    return bs58.encode(bytes);
 }
 
 exports.checkSignature = ({ obj, address }) => {

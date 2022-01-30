@@ -14,11 +14,34 @@ const { addInbox, getInbox, updateInbox } = require('./service/inbox');
 const { httpApi } = require('./config');
 const { getItems } = require('./db');
 const { getSources, getPosts } = require('./publicAPI');
-const { putPost } = require('./privateAPI');
+const { newWif, createSignature } = require('./signatures');
+// const { putPost } = require('./privateAPI');
+
 
 exports.lambdaHandler = async (event, context) => {
     if ('Test' in event) {
-        return getItems({ PK: 'all-sources' });
+        // get a wif - just create new one
+        const {encryptedWif, wif, address} = newWif({password: 'passwd'});
+        
+        // build a post
+        const post = {
+            address, 
+            createdAt: Date.now(), 
+            updatedAt: Date.now(), 
+            type: 'post',
+            test: 'Test post'
+        }
+        
+        // sign it
+        post.signature = createSignature({obj: post, wif});
+        
+        // call putPost
+        await putPost({post});
+        
+        // Check that
+        //   post is created in DDB
+        //   hash is created in DDB
+        //   S3 object is created
     }
 
     if ('Records' in event) { // SQS batch
@@ -46,7 +69,6 @@ exports.lambdaHandler = async (event, context) => {
         switch (path) {
             case httpApi.savePost.path:
                 response = await savePost({ event });
-                response = await putPost({ event });
                 break;
             case httpApi.registerCheckLogin.path:
                 response = await checkLogin({ event });

@@ -47,18 +47,18 @@ module.exports.getItem = async ({ PK, SK }) => {
 module.exports.getItems = async ({ PK, fromSK, toSK }) => {
     let ExpressionAttributeValues = {
         ':PK': PK
-    }
+    };
     let KeyConditionExpression = '#PK = :PK'
     const ExpressionAttributeNames = {
         "#PK": "PK"
-    }
+    };
     if (fromSK) {
         ExpressionAttributeValues[':fromSK'] = fromSK;
         KeyConditionExpression += " and #SK >= :fromSK";
         ExpressionAttributeNames['#SK'] = 'SK';
-    }
+    };
     if (toSK) {
-        ExpressionAttributeValues[':toSK'] = toSK
+        ExpressionAttributeValues[':toSK'] = toSK;
         KeyConditionExpression += " and #SK < :toSK";
         ExpressionAttributeNames['#SK'] = 'SK';
     }
@@ -70,20 +70,20 @@ module.exports.getItems = async ({ PK, fromSK, toSK }) => {
     };
 
     try {
-        queryResult = await dynamoDb.query(params).promise();
+        const queryResult = await dynamoDb.query(params).promise();
 
         let items = queryResult.Items;
         while (queryResult.LastEvaluatedKey) {
-            console.log("LastEvaluatedKey: ", queryResult.LastEvaluatedKey)
-            params.ExpressionAttributeValues[':lastEvaluatedKey'] = queryResult.LastEvaluatedKey.SK
-            params.KeyConditionExpression = KeyConditionExpression + " AND #SK > :lastEvaluatedKey"
+            console.log("LastEvaluatedKey: ", queryResult.LastEvaluatedKey);
+            params.ExpressionAttributeValues[':lastEvaluatedKey'] = queryResult.LastEvaluatedKey.SK;
+            params.KeyConditionExpression = KeyConditionExpression + " AND #SK > :lastEvaluatedKey";
             params.ExpressionAttributeNames['#SK'] = 'SK';
             queryResult = await dynamoDb.query(params).promise();
             // console.log(queryResult)
             items = items.concat(queryResult.Items);
         }
 
-        return items
+        return items;
     }
     catch (e) {
         console.warn("getItems failed", e);
