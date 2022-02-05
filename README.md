@@ -14,14 +14,14 @@ The 'signed' table is defined as:
 
 Here is the list of all used combinations of PK/SK
 - all-sources / source-[address] - sourceJSON
-- posts-from-[address] / post-[createdAt]-[address] - postJSON, replies count, likes count, reposts count
-- hash-[hash] / post-[createdAt]-[address] - type, size, mime-type, username, uploadedAt
-- tag-[tag-name-base64] / post-[createdAt]-[address] 
-- reply-to-[post-hash] / post-[createdAt]-[address] - replies to a particular post version
-- like-[post-hash] / post-[createdAt]-[address] - likes of a particular post version
-- repost-[post-hash] / post-[createdAt]-[address] - reposts of a particular post version
+- posts-from-[address] / post-[createdAt]-[address]-[id] - postJSON, replies count, likes count, reposts count
+- hash-[hash] / post-[createdAt]-[address]-[id] - type, size, mime-type, username, uploadedAt
+- tag-[tag-name-base64] / post-[createdAt]-[address]-[id] 
+- reply-to-[post-hash] / post-[createdAt]-[address]-[id] - replies to a particular post version
+- like-[post-hash] / post-[createdAt]-[address]-[id] - likes of a particular post version
+- repost-[post-hash] / post-[createdAt]-[address]-[id] - reposts of a particular post version
 - all-users / user-[username]
-- inbox-[address] / post-[createdAt]-[address] - postJSON, sourceJSON
+- inbox-[address] / post-[createdAt]-[address]-[id] - postJSON, sourceJSON
 
 ## Internal DB API
 - putItem(Item)
