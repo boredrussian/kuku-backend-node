@@ -15,7 +15,7 @@ const { httpApi } = require('./config');
 const { getItems } = require('./db');
 const { getSources, getPosts } = require('./publicAPI');
 const { newWif, createSignature } = require('./signatures');
-// const { putPost } = require('./privateAPI');
+const { putPost } = require('./privateAPI');
 
 
 exports.lambdaHandler = async (event, context) => {
@@ -36,7 +36,8 @@ exports.lambdaHandler = async (event, context) => {
         post.signature = createSignature({obj: post, wif});
         
         // call putPost
-        await putPost({post});
+        const res = await putPost({event: {post}});
+        console.log('putPost', res);
         
         // Check that
         //   post is created in DDB
@@ -58,17 +59,16 @@ exports.lambdaHandler = async (event, context) => {
     const notFoundResponse = {
         'statusCode': 404,
     };
-
-
-
-    console.log('path---', path);
-    console.log('method---', method);
-    console.log('event---', event);
-
+    
     if (method === 'POST') {
+        const body = JSON.parse(event.body);
+        console.log(method, path, body);
         switch (path) {
-            case httpApi.savePost.path:
-                response = await savePost({ event });
+            case '/post':
+                // TODO: check token!
+                const { post } = body;
+                response = await putPost({ post });
+                //response = await savePost({ event });
                 break;
             case httpApi.registerCheckLogin.path:
                 response = await checkLogin({ event });
@@ -109,12 +109,13 @@ exports.lambdaHandler = async (event, context) => {
     }
 
     else if (method === 'GET') {
+        console.log(method, path);
         switch (path) {
             case '/sources':
                 response = await getSources({ event });
                 break;
             case '/posts':
-                response = await getPosts({ event });
+                response = await getPosts(event.queryStringParameters);
                 break;
             case httpApi.getInbox.path:
                 response = await getInbox({ event });

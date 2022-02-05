@@ -71,18 +71,15 @@ module.exports.getItems = async ({ PK, fromSK, toSK }) => {
 
     try {
         const queryResult = await dynamoDb.query(params).promise();
-
         let items = queryResult.Items;
         while (queryResult.LastEvaluatedKey) {
-            console.log("LastEvaluatedKey: ", queryResult.LastEvaluatedKey);
+            // console.log("LastEvaluatedKey: ", queryResult.LastEvaluatedKey);
             params.ExpressionAttributeValues[':lastEvaluatedKey'] = queryResult.LastEvaluatedKey.SK;
             params.KeyConditionExpression = KeyConditionExpression + " AND #SK > :lastEvaluatedKey";
             params.ExpressionAttributeNames['#SK'] = 'SK';
             queryResult = await dynamoDb.query(params).promise();
-            // console.log(queryResult)
             items = items.concat(queryResult.Items);
         }
-
         return items;
     }
     catch (e) {

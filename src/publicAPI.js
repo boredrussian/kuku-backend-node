@@ -1,6 +1,6 @@
 const { getItems, getItem } = require('./db');
 
-module.exports.getPosts = async ({ event }) => {
+module.exports.getPosts = async ({ address, createdBefore, createdAfter }) => {
     // DB:
     //    posts-from-[address] / post-[createdAt]-[address] - postJSON, replies count, likes count, reposts count
     //     - GET /posts?createdBefore=?&createdAfter=? for a particular timestamp range (createdAt)
@@ -9,19 +9,20 @@ module.exports.getPosts = async ({ event }) => {
     //   - OR replies to a specific post hash: &replyTo=<hash>
     let posts = [];
     let params = {};
-    if('createdBefore' in event) params.toSK = 'post-' + event.createdBefore;
-    if('createdAfter' in event) params.fromSK = 'post-' + event.createdAfter;
-    if('address' in event) {
-        const addresses = event.address.split(',');
+    if(createdBefore) params.toSK = 'post-' + createdBefore;
+    if(createdAfter) params.fromSK = 'post-' + createdAfter;
+    if(address) {
+        const addresses = address.split(',');
         const postArrays = (await Promise.allSettled(addresses.map(
             address => getItems({...params,  PK: "posts-from-" + address })))
-        ).map(src => src.value);
+        ).map(a => a.value);
         postArrays.forEach(arr => {posts.push(...arr)});
+        posts = posts.map(p => { return {post: p.post, postStats: p.postStats}});
     }
     return posts;
 };
 
-getDefaultAddresses = async() => {
+const getDefaultAddresses = async() => {
     return ['1EQBTachaCgQtBR1dJodJEEgD5mKAyUrEv'];
 }
 

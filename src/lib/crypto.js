@@ -18,6 +18,7 @@ const isSignaturesValid = ({ message, address, signature }) => {
 };
 
 const bodyEncrypted = ({ event }) => {
+    return parseJson(event.body);
     let body;
     if (!event) {
         return;

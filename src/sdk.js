@@ -1,6 +1,7 @@
 const { checkSignature, getHash } = require('./signatures')
 
 // Don't have a dependency to DDB, React
+// Has a dependency on axios
 
 // Methods:
 // New source

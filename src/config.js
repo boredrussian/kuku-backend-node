@@ -1,8 +1,8 @@
 exports.config = {
-    bucket: 'kuku-staging',
-    fileStorage: 'public/file_storage',
-    сonfigFile: 'public/config.json',
-    region: "us-west-2",
+    bucket: 'signed.project',
+    fileStorage: 'assets',
+    сonfigFile: 'config.json',
+    region: "eu-west-1",
     signedTableName: "signed",
     inboxTableName: "inbox",
     indexTableName: "signed-index",

@@ -21,25 +21,22 @@ const putS3 = async ({hash, data, contentType}) => {
     }).promise();
 }
         
-module.exports.putPost = async ({ event }) => {
+module.exports.putPost = async ({ post }) => {
     // posts-from-[address] / post-[createdAt]-[address] - postJSON, replies count, likes count, reposts count
     // hash-[hash] / post-[createdAt]-[address] - type, size, mime-type, username, uploadedAt
 
-    // TODO - check the JWT token!
-    
-    const { post } = event;
-    const { address, createdAt, updatedAt, signature, type } = post;
+    const { address, createdAt, id, updatedAt, signature, type } = post;
     
     // Check post fields
-    if(!address || !createdAt || !updatedAt || !signature || !type) throw 'Post missing a required field';
+    if(!address || !createdAt || !id || !updatedAt || !signature || !type) throw 'Post missing a required field';
     
     // validate post
-    if(!checkSignature(post, address)) throw 'Invalid signature';
+    if(!checkSignature({obj: post, address})) throw 'Invalid signature';
     
     // add post to DDB - only overwrite if the post is newer
     let Item = {
         PK: 'posts-from-' + address,
-        SK: 'post-' + createdAt + '-' + address,
+        SK: 'post-' + createdAt + '-' + address + '-' + id,
         post,
         postStats: {
             likesCount: 0,
@@ -47,7 +44,8 @@ module.exports.putPost = async ({ event }) => {
             commentsCount:0
         }
     }
-    const existingItem = getItem(Item);
+    const existingItem = await getItem(Item);
+    console.log(existingItem);
     if(existingItem && existingItem.post.updatedAt > post.updatedAt) return false;
     
     const hash = getHash({obj: post});
@@ -60,7 +58,7 @@ module.exports.putPost = async ({ event }) => {
     // add post hash to DDB
     Item = {
         PK: 'hash-' + hash,
-        SK: 'post-' + createdAt + '-' + address,
+        SK: 'post-' + createdAt + '-' + address + '-' + id,
         type: 'post',
         contentType,
         size: postJSON.length,
